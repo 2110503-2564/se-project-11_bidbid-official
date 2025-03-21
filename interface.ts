@@ -11,6 +11,37 @@ export interface VenueItem {
     __v: number,
     id: string
   }
+
+  // -------------------------------
+  // Massage Shop
+  export interface MassageItem {
+    _id: string,
+    name: string,
+    address: string,
+    priceRange: string,
+    phoneNumber: string,
+    openTime: string,
+    closeTime: string,
+    __v: number,
+    picture: string,
+    id: string
+  }
+
+  export  interface MassageJson {
+    success: boolean,
+    count: number,
+    pagination: Object,
+    data: MassageItem[]
+  }
+
+  export  interface ReservationItem {
+    nameLastname: string;
+    tel: string;
+    massageShop: string;
+    bookDate: string;
+  }
+
+// -------------------------------
   
 export  interface VenueJson {
     success: boolean,
@@ -25,3 +56,5 @@ export  interface BookingItem {
     venue: string;
     bookDate: string;
   }
+
+  

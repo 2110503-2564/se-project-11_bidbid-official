@@ -10,7 +10,7 @@ export default function DateReserve( {onDateChange, onLocationChange}
     : { onDateChange:Function, onLocationChange:Function } ) {
 
     const [bookDate, setBookDate] = useState<Dayjs | null>(null)
-    const [venue, setVenue] = useState<string>('Bloom')
+    const [venue, setVenue] = useState<string>('Aroma')
 
     return (
 
@@ -28,9 +28,10 @@ export default function DateReserve( {onDateChange, onLocationChange}
             name="location" id="location" value={venue}
             onChange={ (e)=> {setVenue(e.target.value); onLocationChange(e.target.value) } } 
             className="h-[2em] w-[300px]">
-                <MenuItem value="Bloom">The Bloom Pavilion</MenuItem>
-                <MenuItem value="Spark">Spark Space</MenuItem>
-                <MenuItem value="GrandTable">The Grand Table</MenuItem>
+                <MenuItem value="Aroma">Aroma Haus</MenuItem>
+                <MenuItem value="Zen">The Zen Garden</MenuItem>
+                <MenuItem value="MayIScan">May I Scan</MenuItem>
+                <MenuItem value="Spa">Serenity Spa</MenuItem>
             </Select>
                 
         </div>

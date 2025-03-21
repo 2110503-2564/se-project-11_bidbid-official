@@ -13,7 +13,6 @@ export default async function VenueCatalog( {venueJson} : {venueJson:Promise<Ven
             justifyContent:"space-around", alignContent:"space-around", padding:"10px" }}>
             {
                 venueJsonReady.data.map((venueItem:VenueItem)=>(
-                // venuesJsonReady.data.slice(0, 3).map((venueItem: VenueItem) => (
                     <Link key={venueItem.id} href={`/venue/${venueItem.id}`} className="w-1/5">
                         <Card venueName={venueItem.name} imgSrc={venueItem.picture}/>
                     </Link>
