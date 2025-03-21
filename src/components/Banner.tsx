@@ -39,7 +39,7 @@ export default function Banner() {
 
             <div className={styles.bannerText}>
                 <h1 className='text-4xl font-medium'>Relax, Rejuvenate, and Reserve with Ease</h1>
-                <h4 className='text-lg font-serif'>your perfect massage experience starts here</h4>
+                <h4 className='text-lg font-serif'> your perfect massage experience starts here </h4>
             </div>
             <button className='bg-white text-cyan-600 border border-cyan-600
                 font-semibold py-2 px-2 m-2 rounded z-30 absolute bottom-0 right-0
