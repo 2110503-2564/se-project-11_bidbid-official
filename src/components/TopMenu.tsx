@@ -63,12 +63,15 @@ export default async function TopMenu() {
                     )
                 }
 
-                <TopMenuItem title='My Booking' pageRef='/mybooking' />
+                {/* <TopMenuItem title='My Booking' pageRef='/mybooking' /> */}
+                <TopMenuItem title='My Resevation' pageRef='/myreservation' />
             </div>
 
             <div className="flex-grow"></div>
 
-            <TopMenuItem title='Booking' pageRef='/booking' />
+            {/* <div className='w-[90px]'><TopMenuItem title='Booking' pageRef='/booking'/></div> */}
+            <div className='w-[90px]'><TopMenuItem title='Reservation' pageRef='/reservation'/></div>
+            <div className='w-[70px]'><TopMenuItem title='Home' pageRef='/' /></div>
 
             <Image 
                 src={'/img/logo.png'} 

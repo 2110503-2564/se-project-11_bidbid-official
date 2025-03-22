@@ -38,7 +38,7 @@ export interface VenueItem {
     nameLastname: string;
     tel: string;
     massageShop: string;
-    bookDate: string;
+    reserveDate: string;
   }
 
 // -------------------------------
