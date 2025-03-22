@@ -1,54 +1,19 @@
-// import { getCsrfToken } from "next-auth/react"
-
-// // export default function SignIn({ csrfToken }: any) {
-// export default async function SignIn() {
-
-//   const csrfToken = await getCsrfToken()
-
-//   return (
-//     <div className="flex flex-col items-center min-h-screen bg-gray-100 pt-24">
-//       <form
-//         method="post"
-//         // action="/api/auth/callback/credentials"
-//         action="/api/auth/callback/credentials?callbackUrl=/"
-//         className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"
-//       >
-//         <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
-//         <label className="block mb-2">
-//           Email
-//           <input name="email" type="email" className="block border p-2 rounded w-full" />
-//         </label>
-//         <label className="block mb-4">
-//           Password
-//           <input name="password" type="password" className="block border p-2 rounded w-full" />
-//         </label>
-//         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded w-full">
-//           Sign in
-//         </button>
-//       </form>
-//     </div>
-//   )
-// }
-
-// SignIn.getInitialProps = async (context: any) => {
-//   return {
-//     csrfToken: await getCsrfToken(context)
-//   }
-// }
-// pages/auth/signin.tsx
-
 'use client'
 
 import { useState, useEffect } from 'react'
 import { signIn, getCsrfToken } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [csrfToken, setCsrfToken] = useState('')
   const router = useRouter()
+
+  const { data: session } = useSession()
+  console.log(session?.user)
 
   useEffect(() => {
     const fetchCsrf = async () => {
@@ -64,7 +29,8 @@ export default function SignInPage() {
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: false
+      redirect: false,
+      // token: user.token,
     })
 
     if (res?.ok) {
@@ -72,7 +38,30 @@ export default function SignInPage() {
     } else {
       alert("Login failed.")
     }
+
+    // try {
+    //   const res = await fetch('http://localhost:5000/api/v1/auth/login', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ email, password }),
+    //   })
+  
+    //   const data = await res.json()
+  
+    //   if (res.ok) {
+    //     localStorage.setItem('token', data.token) // Store token
+    //     alert('Login successful!')
+    //     router.push('/')
+    //   } else {
+    //     alert(data.message || 'Login failed.')
+    //   }
+    // } catch (err) {
+    //   alert('Error logging in')
+    //   console.error(err)
+    // }
+
   }
+
 
   return (
     <div className="h-screen bg-gray-100 flex justify-center pt-24">

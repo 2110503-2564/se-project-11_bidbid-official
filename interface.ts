@@ -34,12 +34,29 @@ export interface VenueItem {
     data: MassageItem[]
   }
 
-  export  interface ReservationItem {
-    nameLastname: string;
-    tel: string;
-    massageShop: string;
-    reserveDate: string;
+  // export  interface ReservationItem {
+  //   nameLastname: string;
+  //   tel: string;
+  //   massageShop: string;
+  //   reserveDate: string;
+  // }
+
+  export interface ReservationItem {
+    _id: string
+    reservationDate: string
+    massageShop: {
+      _id: string
+      name: string
+      address: string
+      phoneNumber: string
+      openTime: string
+      closeTime: string
+      id: string
+    }
+    user: string
+    createdAt: string
   }
+  
 
 // -------------------------------
   

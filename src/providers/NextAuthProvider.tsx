@@ -10,3 +10,18 @@ export default function NextAuthProvider({children, session}
                 </SessionProvider>
         )
     }
+
+// export default function NextAuthProvider({
+//     children,
+//     session,
+//   }: {
+//     children: React.ReactNode
+//     session: any
+//   }) {
+//     return (
+//       <SessionProvider session={session}>
+//         {children}
+//       </SessionProvider>
+//     )
+//   }
+  

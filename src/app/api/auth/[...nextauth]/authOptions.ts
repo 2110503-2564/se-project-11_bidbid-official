@@ -34,16 +34,37 @@ export const authOptions: AuthOptions = {
           })
     ],
     session: { strategy: "jwt" },
+    // callbacks: {
+    //   async jwt({token, user}) {
+    //     return {...token, ...user}
+    //   },
+    //   async session({session, token, user}) {
+    //     session.user = token as any
+    //     return session
+    //   },
+    // },
+    // pages: {
+    //   signIn: "/auth/signin", 
+    // },
     callbacks: {
-      async jwt({token, user}) {
-        return {...token, ...user}
+      async jwt({ token, user }) {
+        if (user) {
+          const u = user as any
+          token.accessToken = u.token
+          token.name = u.name
+          token.email = u.email
+        }
+        return token
       },
-      async session({session, token, user}) {
-        session.user = token as any
+      async session({ session, token }) {
+        session.user = {
+          name: token.name ?? '',
+          email: token.email ?? '',
+          role: token.role ?? '',
+          id: token.id ?? ''
+        }
+        session.accessToken = token.accessToken ?? ''
         return session
-      },
-    },
-    pages: {
-      signIn: "/auth/signin", 
+      }
     },
 }

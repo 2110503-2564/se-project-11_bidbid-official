@@ -28,7 +28,7 @@ export default function SignUpPage() {
 
     if (res.ok) {
       alert('Account created successfully!')
-      router.push('/auth/signin')
+      router.push('/api/auth/signin')
     } else {
       const error = await res.json()
       alert(error.message || 'Failed to create account.')
