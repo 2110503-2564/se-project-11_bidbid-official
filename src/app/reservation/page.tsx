@@ -58,9 +58,14 @@ export default function Reservation() {
                 <DateReserve onDateChange={(value:Dayjs)=>{setReserveDate(value)}}
                 onLocationChange={(value:string)=>{setMassageShop(value)}}/>
 
-                <button name="Book Venue"  className="block rounded-md bg-sky-600 
-                hover:bg-indigo-600 px-3 py-2 text-white shadow-sm"
-                onClick={makeReservation} >
+                <button name="Reserve Massage"  
+                className="block rounded-md bg-sky-600 
+                hover:bg-indigo-600 px-3 py-2 text-white shadow-sm
+                active:bg-indigo-700 active:scale-95 "
+                onClick = { () => {
+                    makeReservation()
+                    alert("You have made a reservation")
+                }} >
                     Reserve Massage
                 </button>
 

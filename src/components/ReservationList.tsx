@@ -27,8 +27,11 @@ export default function ReservationList() {
                         <div className="text-md">Massage Shop: {ReservationItem.massageShop}</div>
                         <div className="text-md">Booking Date: {ReservationItem.reserveDate}</div>
 
-                        <button className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-2
-                        text-white shadow-sm my-2" onClick={ () => dispatch(removeReservation(ReservationItem)) } >
+                        <button 
+                        className="block rounded-md bg-sky-600 text-white shadow-sm my-2
+                        hover:bg-indigo-600 px-3 py-2
+                        active:bg-indigo-700 active:scale-95" 
+                        onClick={ () => dispatch(removeReservation(ReservationItem)) } >
                             Remove from Booking List
                         </button>
                 </div>
