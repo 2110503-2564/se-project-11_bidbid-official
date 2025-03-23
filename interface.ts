@@ -54,7 +54,13 @@ export interface VenueItem {
       id: string
       picture: string 
     }
-    user: string
+    // user: string
+    user: {
+      _id: string
+      name: string
+      phoneNumber: string
+      email?: string
+    }
     createdAt: string
   }
   
