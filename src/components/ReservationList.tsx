@@ -117,32 +117,15 @@ export default function ReservationList() {
         <p className="text-gray-500 text-center py-5">No Massage Reservations</p>
       ) : (
         reservations.map((item) => (
-        //   <div
-        //     className="bg-slate-200 rounded px-5 mx-5 py-2 my-3"
-        //     key={item.nameLastname + item.massageShop + item.reserveDate}
-        //   >
-        //     <div className="text-xl font-semibold">{item.nameLastname}</div>
-        //     <div className="text-md">Contact: {item.tel}</div>
-        //     <div className="text-md">Massage Shop: {item.massageShop}</div>
-        //     <div className="text-md">Booking Date: {item.reserveDate}</div>
-        //   </div>
-
           <div
               className="bg-slate-200 rounded px-5 mx-5 py-2 my-3"
               key={item._id}
           >
-            {/* <div className="text-xl font-semibold">Massage Shop: {item.massageShop.name}</div>
-            <div className="text-md">Address: {item.massageShop.address}</div>
-            <div className="text-md">Contact: {item.massageShop.phoneNumber}</div>
-            <div className="text-md">
-                Booking Date: {new Date(item.reservationDate).toLocaleDateString()}
-            </div> */}
-
             {
             item.massageShop ? 
             (
             <>
-                <div className="text-xl font-semibold">Massage Shop: {item.massageShop.name}</div>
+                <div className="text-xl font-semibold">{item.massageShop.name}</div>
                 <div className="text-md">Address: {item.massageShop.address}</div>
                 <div className="text-md">Contact: {item.massageShop.phoneNumber}</div>
             </>
@@ -151,7 +134,6 @@ export default function ReservationList() {
             (
                 <div className="text-red-500">Massage shop data not available</div>
             )}
-
         </div>
         ))
       )}
