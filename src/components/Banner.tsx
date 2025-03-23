@@ -19,7 +19,7 @@ export default function Banner() {
 
     const { data: session } = useSession()
     console.log("Session:", session);
-    console.log(session?.user.token)
+    // console.log(session?.user.token)
     console.log(session?.user.name)
 
     return (
