@@ -189,14 +189,16 @@ export default function ReservationList() {
                   
                   <button
                       onClick={() => handleUpdate(item._id)}
-                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 mr-3"
+                      className="bg-green-600 text-white px-3 py-1 rounded mr-3 
+                      hover:bg-green-700 active:bg-green-700 active:scale-95"
                     >
                       Update Reservation
                   </button>
 
                   <button
                     onClick={() => handleRemove(item._id)}
-                    className="mt-3 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                    className="mt-3 bg-red-600 text-white px-3 py-1 rounded 
+                    hover:bg-red-700 active:bg-red-700 active:scale-95"
                   >
                     Remove Reservation
                   </button>
