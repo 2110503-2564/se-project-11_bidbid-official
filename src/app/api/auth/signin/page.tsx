@@ -39,27 +39,6 @@ export default function SignInPage() {
       alert("Login failed.")
     }
 
-    // try {
-    //   const res = await fetch('http://localhost:5000/api/v1/auth/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ email, password }),
-    //   })
-  
-    //   const data = await res.json()
-  
-    //   if (res.ok) {
-    //     localStorage.setItem('token', data.token) // Store token
-    //     alert('Login successful!')
-    //     router.push('/')
-    //   } else {
-    //     alert(data.message || 'Login failed.')
-    //   }
-    // } catch (err) {
-    //   alert('Error logging in')
-    //   console.error(err)
-    // }
-
   }
 
 
