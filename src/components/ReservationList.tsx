@@ -43,22 +43,25 @@
 // }
 
 'use client'
-
+import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { ReservationItem , MassageItem } from '../../interface'
 
 export default function ReservationList() {
+  const { data: session } = useSession() //debug show only user's reserve
   const [reservations, setReservations] = useState<ReservationItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!session?.accessToken) return //debug show only user's reserve
+
+    console.log("user token: " , session?.accessToken)
+
     const fetchReservations = async () => {
       try {
-        const token = localStorage.getItem('token') // or get from useSession if using NextAuth
-
         const res = await fetch('http://localhost:5000/api/v1/reservations', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${session.accessToken}`,
             'Content-Type': 'application/json',
           },
         })
@@ -68,7 +71,7 @@ export default function ReservationList() {
         }
 
         const data = await res.json()
-        setReservations(data.data || []) // adjust based on your backend response shape
+        setReservations(data.data || [])
       } catch (err) {
         console.error('Error:', err)
       } finally {
@@ -76,8 +79,35 @@ export default function ReservationList() {
       }
     }
 
+    // const fetchReservations = async () => {
+    //   try {
+    //     const token = localStorage.getItem('token') // or get from useSession if using NextAuth
+
+    //     const res = await fetch('http://localhost:5000/api/v1/reservations', {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //     })
+
+    //     console.log("user's token: ", token)
+
+    //     if (!res.ok) {
+    //       throw new Error('Failed to fetch reservations')
+    //     }
+
+    //     const data = await res.json()
+    //     setReservations(data.data || []) // adjust based on your backend response shape
+    //   } catch (err) {
+    //     console.error('Error:', err)
+    //   } finally {
+    //     setLoading(false)
+    //   }
+    // }
+
     fetchReservations()
-  }, [])
+  }, [session])
+  // }, [])
 
   return (
     <div>
@@ -97,10 +127,10 @@ export default function ReservationList() {
         //     <div className="text-md">Booking Date: {item.reserveDate}</div>
         //   </div>
 
-        <div
-            className="bg-slate-200 rounded px-5 mx-5 py-2 my-3"
-            key={item._id}
-        >
+          <div
+              className="bg-slate-200 rounded px-5 mx-5 py-2 my-3"
+              key={item._id}
+          >
             {/* <div className="text-xl font-semibold">Massage Shop: {item.massageShop.name}</div>
             <div className="text-md">Address: {item.massageShop.address}</div>
             <div className="text-md">Contact: {item.massageShop.phoneNumber}</div>
