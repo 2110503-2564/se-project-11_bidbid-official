@@ -52,6 +52,7 @@ export interface VenueItem {
       openTime: string
       closeTime: string
       id: string
+      picture: string 
     }
     user: string
     createdAt: string
