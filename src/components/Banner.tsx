@@ -38,8 +38,8 @@ export default function Banner() {
             }
 
             <div className={styles.bannerText}>
-                <h1 className='text-4xl font-medium'>Relax, Rejuvenate, and Reserve with Ease</h1>
-                <h4 className='text-lg font-serif'> your perfect massage experience starts here </h4>
+                <h1 className='text-5xl'>Relax, Rejuvenate, and Reserve with Ease</h1>
+                <h4 className='text-xl mt-3'> your perfect massage experience starts here </h4>
             </div>
             <button className='bg-white text-blue-800 border border-blue-800
                 font-semibold py-2 px-2 mr-8 mb-5 rounded z-30 absolute bottom-0 right-0
