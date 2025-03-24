@@ -1,5 +1,4 @@
-import CardPanel from "@/components/CardPanel";
-import VenueCatalog from "@/components/VenueCatalog";
+
 import MassageCatalog from "@/components/MassageCatalog";
 import getMassageShops from "@/libs/getMassageShops";
 import { Suspense } from "react";
