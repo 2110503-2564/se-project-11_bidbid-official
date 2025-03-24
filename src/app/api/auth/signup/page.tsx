@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import registerUser from '@/libs/register'
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -14,24 +15,32 @@ export default function SignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        phoneNumber,
-        role: 'user', // Force role to be user
-      }),
-    })
+    // const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/auth/register', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     name,
+    //     email,
+    //     password,
+    //     phoneNumber,
+    //     role: 'user', // Force role to be user
+    //   }),
+    // })
 
-    if (res.ok) {
+    // if (res.ok) {
+    //   alert('Account created successfully!')
+    //   router.push('/api/auth/signin')
+    // } else {
+    //   const error = await res.json()
+    //   alert(error.message || 'Failed to create account.')
+    // }
+
+    try {
+      await registerUser({ name, email, password, phoneNumber })
       alert('Account created successfully!')
       router.push('/api/auth/signin')
-    } else {
-      const error = await res.json()
-      alert(error.message || 'Failed to create account.')
+    } catch (err: any) {
+      alert(err.message || 'Failed to create account.')
     }
   }
 

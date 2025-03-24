@@ -8,6 +8,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { Select, MenuItem, Button } from '@mui/material'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSession } from 'next-auth/react'
+import getMassageShops from '@/libs/getMassageShops'
+import getReservation from "@/libs/getReservation"
+import updateReservation from '@/libs/updateReservation'
 
 export default function UpdateReservationPage() {
   const { rid } = useParams()
@@ -21,19 +24,13 @@ export default function UpdateReservationPage() {
   const [previousDate, setPreviousDate] = useState('')
 
   useEffect(() => {
+
     const fetchReservation = async () => {
       try {
-        const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
-          headers: {
-            Authorization: `Bearer ${session?.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        })
+        if (!rid || !session?.accessToken) return
 
-        if (!res.ok) throw new Error('Failed to fetch reservation')
+        const { reservation, formattedDate, readableDate } = await getReservation(rid as string, session.accessToken)
 
-        const data = await res.json()
-        const reservation = data.data
         setPreviousShop(reservation.massageShop.name)
         setPreviousDate(dayjs(reservation.reservationDate).format('YYYY-MM-DD'))
         setMassageShopId(reservation.massageShop._id)
@@ -43,10 +40,41 @@ export default function UpdateReservationPage() {
       }
     }
 
+    // const fetchReservation = async () => {
+    //   try {
+    //     const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
+    //       headers: {
+    //         Authorization: `Bearer ${session?.accessToken}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //     })
+
+    //     if (!res.ok) throw new Error('Failed to fetch reservation')
+
+    //     const data = await res.json()
+    //     const reservation = data.data
+    //     setPreviousShop(reservation.massageShop.name)
+    //     setPreviousDate(dayjs(reservation.reservationDate).format('YYYY-MM-DD'))
+    //     setMassageShopId(reservation.massageShop._id)
+    //     setReservationDate(dayjs(reservation.reservationDate))
+    //   } catch (err) {
+    //     console.error('Error fetching reservation:', err)
+    //   }
+    // }
+
+    // const fetchShops = async () => {
+    //   const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/massageShops')
+    //   const data = await res.json()
+    //   setShops(data.data || [])
+    // }
+
     const fetchShops = async () => {
-      const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/massageShops')
-      const data = await res.json()
-      setShops(data.data || [])
+      try {
+        const data = await getMassageShops()
+        setShops(data.data || [])
+      } catch (err) {
+        console.error('Error fetching shops:', err)
+      }
     }
 
     if (session?.accessToken) {
@@ -59,28 +87,42 @@ export default function UpdateReservationPage() {
     if (!reservationDate || !massageShopId || !session?.accessToken) return
 
     try {
-      const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-        body: JSON.stringify({
-          reservationDate: reservationDate.toISOString(),
-          massageShop: massageShopId,
-        }),
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to update reservation')
-      }
-
+      await updateReservation(
+        String(rid),
+        reservationDate.toISOString(),
+        massageShopId,
+        session.accessToken
+      )
       alert('Reservation updated successfully')
       router.push('/myreservation')
     } catch (err) {
       console.error('Update error:', err)
       alert('Failed to update reservation')
     }
+
+    // try {
+    //   const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
+    //     method: 'PUT',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${session.accessToken}`,
+    //     },
+    //     body: JSON.stringify({
+    //       reservationDate: reservationDate.toISOString(),
+    //       massageShop: massageShopId,
+    //     }),
+    //   })
+
+    //   if (!res.ok) {
+    //     throw new Error('Failed to update reservation')
+    //   }
+
+    //   alert('Reservation updated successfully')
+    //   router.push('/myreservation')
+    // } catch (err) {
+    //   console.error('Update error:', err)
+    //   alert('Failed to update reservation')
+    // }
   }
 
   return (

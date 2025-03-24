@@ -3,6 +3,8 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { ReservationItem, MassageItem } from '../../interface'
 import { useRouter } from 'next/navigation'
+import getReservations from '@/libs/getReservations'
+import removeReservation from '@/libs/removeReservation'
 
 export default function ReservationList() {
   const { data: session } = useSession()
@@ -11,49 +13,69 @@ export default function ReservationList() {
   const router = useRouter() // route to update page
 
   const fetchReservations = async () => {
+    if (!session?.accessToken) return
+
     try {
-      const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations', {
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch reservations')
-      }
-
-      const data = await res.json()
-      setReservations(data.data || [])
+      const reservationsData = await getReservations(session.accessToken)
+      setReservations(reservationsData || [])
     } catch (err) {
       console.error('Error:', err)
     } finally {
       setLoading(false)
     }
+
+    // try {
+    //   const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations', {
+    //     headers: {
+    //       Authorization: `Bearer ${session?.accessToken}`,
+    //       'Content-Type': 'application/json',
+    //     },
+    //   })
+
+    //   if (!res.ok) {
+    //     throw new Error('Failed to fetch reservations')
+    //   }
+
+    //   const data = await res.json()
+    //   setReservations(data.data || [])
+    // } catch (err) {
+    //   console.error('Error:', err)
+    // } finally {
+    //   setLoading(false)
+    // }
   }
 
   const handleRemove = async (id: string) => {
     if (!session?.accessToken) return
 
     try {
-      const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to delete reservation')
-      }
-
+      await removeReservation(id, session.accessToken)
       setReservations(prev => prev.filter(item => item._id !== id))
       alert('Reservation removed successfully')
     } catch (err) {
       console.error('Delete error:', err)
       alert('Failed to remove reservation')
     }
+
+    // try {
+    //   const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${id}`, {
+    //     method: 'DELETE',
+    //     headers: {
+    //       Authorization: `Bearer ${session.accessToken}`,
+    //       'Content-Type': 'application/json',
+    //     },
+    //   })
+
+    //   if (!res.ok) {
+    //     throw new Error('Failed to delete reservation')
+    //   }
+
+    //   setReservations(prev => prev.filter(item => item._id !== id))
+    //   alert('Reservation removed successfully')
+    // } catch (err) {
+    //   console.error('Delete error:', err)
+    //   alert('Failed to remove reservation')
+    // }
   }
 
   const handleUpdate = (id: string) => {
