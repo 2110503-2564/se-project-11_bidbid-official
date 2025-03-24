@@ -54,8 +54,10 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
           <div className="text-medium mx-5">Close Time: {massage.closeTime}</div>
           <button
             onClick={() => router.push('/reservation')}
-            className="mx-5 my-3 bg-blue-600 text-white px-3 py-1 rounded 
-              hover:bg-blue-700 active:bg-blue-700 active:scale-95"
+            className="mx-5 my-3 bg-blue-800 text-white px-3 py-1 rounded 
+              border border-transparent
+              hover:bg-white hover:border-blue-800 hover:text-blue-800 
+              active:bg-white active:border-blue-800 active:text-blue-800  active:scale-95"
           >
             Reserve NOW!
           </button>

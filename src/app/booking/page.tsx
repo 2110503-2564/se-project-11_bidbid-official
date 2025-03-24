@@ -39,23 +39,9 @@ export default function Booking() {
     const [bookDate, setBookDate] = useState<Dayjs | null>(null)
     const [venue, setVenue] = useState<string>('Bloom')
 
-    // const session = await getServerSession(authOptions)
-
-    // if(!session || !session.user.token) return null
-
-    // const profile = await getUserProfile(session.user.token)
-    // var createdAt = new Date(profile.data.createdAt)
-
     return(
         <main className="w-[100%] flex flex-col items-center space-y-4">
             <div className="px-5 py-5 text-2xl font-bold">Venue Booking</div>
-
-            {/* <div className="text-2xl">{profile.data.name}</div>
-            <table className="table-auto border-separate border-spacing-2"><tbody>
-                <tr><td>Email</td><td>{profile.data.email}</td></tr>
-                <tr><td>Tel.</td><td>{profile.data.tel}</td></tr>
-                <tr><td>Member Since</td><td>{createdAt.toString()}</td></tr>
-            </tbody></table> */}
 
             <div className="bg-slate-100 rounded-lg space-y-2
             w-fit px-10 py-5 flex flex-col space-y-5 justify-center items-center">

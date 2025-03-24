@@ -51,44 +51,34 @@ export default function TopMenu() {
          border-b border-gray-300 items-center px-4'>
 
             <div className="flex flex-row items-center gap-4">
-                {/* {
-                    session ? 
-                    (
-                        <Link href="/api/auth/signout" className='text-cyan-600 text-sm'>
-                            Sign-Out of {session.user?.name}
-                        </Link>
-                    ) 
-                    : 
-                    (
-                        <Link href="/api/auth/signin" className='text-cyan-600 text-sm'>
-                            Sign-In
-                        </Link>
-                    )
-                } */}
 
                 {
                     status === 'loading' ? (
                     <span className="text-sm text-gray-500">Loading...</span>
                     ) : session ? (
-                    <Link href="/api/auth/signout" className="text-cyan-600 text-sm">
+                    <Link href="/api/auth/signout" 
+                    className="text-cyan-600 text-sm hover:underline">
                         Sign-Out of {session.user?.name}
                     </Link>
                     ) : (
-                    <Link href="/api/auth/signin" className="text-cyan-600 text-sm">
+                    <Link href="/api/auth/signin" 
+                    className="text-cyan-600 text-sm hover:underline">
                         Sign-In
                     </Link>
                     )
                 }
 
-                {/* <TopMenuItem title='My Booking' pageRef='/mybooking' /> */}
                 <TopMenuItem title='My Resevation' pageRef='/myreservation' />
             </div>
 
             <div className="flex-grow"></div>
 
-            {/* <div className='w-[90px]'><TopMenuItem title='Booking' pageRef='/booking'/></div> */}
-            <div className='w-[90px]'><TopMenuItem title='Reservation' pageRef='/reservation'/></div>
-            <div className='w-[70px]'><TopMenuItem title='Home' pageRef='/' /></div>
+            <div className='w-[90px]'>
+                <TopMenuItem title='Reservation' pageRef='/reservation'/>
+            </div>
+            <div className='w-[70px]'>
+                <TopMenuItem title='Home' pageRef='/' />
+            </div>
 
             <Image 
                 src={'/img/logo.png'} 

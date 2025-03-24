@@ -28,7 +28,7 @@ export default function Reservation() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/massageShops/${massageShopId}/reservations`, {
+      const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/massageShops/${massageShopId}/reservations`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
@@ -80,8 +80,10 @@ export default function Reservation() {
 
         <button
           name="Reserve Massage"
-          className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-2 text-white 
-          shadow-sm active:bg-indigo-700 active:scale-95"
+          className="block rounded-md bg-blue-800 px-3 py-2 text-white shadow-sm 
+          border border-transparent
+          hover:bg-white hover:border-blue-800 hover:text-blue-800
+          active:bg-white active:border-blue-800 active:text-blue-800 active:scale-95"
           onClick={handleReservation}
         >
           Reserve Massage

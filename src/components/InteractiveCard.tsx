@@ -8,7 +8,8 @@ export default function InteractiveCard( { children } : { children:React.ReactNo
             event.currentTarget.classList.remove('shadow-lg');
             event.currentTarget.classList.remove('bg-white');
             event.currentTarget.classList.add('shadow-2xl');
-            event.currentTarget.classList.add('bg-neutral-200');
+            event.currentTarget.classList.add('bg-white');
+            event.currentTarget.classList.add('hover:scale-105');
         }
         else
         {

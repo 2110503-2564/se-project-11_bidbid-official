@@ -12,7 +12,7 @@ export default function ReservationList() {
 
   const fetchReservations = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/v1/reservations', {
+      const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations', {
         headers: {
           Authorization: `Bearer ${session?.accessToken}`,
           'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export default function ReservationList() {
     if (!session?.accessToken) return
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/reservations/${id}`, {
+      const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${session.accessToken}`,

@@ -23,7 +23,7 @@ export default function UpdateReservationPage() {
   useEffect(() => {
     const fetchReservation = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/v1/reservations/${rid}`, {
+        const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
             'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export default function UpdateReservationPage() {
     }
 
     const fetchShops = async () => {
-      const res = await fetch('http://localhost:5000/api/v1/massageShops')
+      const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/massageShops')
       const data = await res.json()
       setShops(data.data || [])
     }
@@ -59,7 +59,7 @@ export default function UpdateReservationPage() {
     if (!reservationDate || !massageShopId || !session?.accessToken) return
 
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/reservations/${rid}`, {
+      const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
