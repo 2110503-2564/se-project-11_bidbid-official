@@ -48,5 +48,6 @@ export default function Banner() {
                 Select Massage Shops
             </button>
         </div>
+        
     );
 }

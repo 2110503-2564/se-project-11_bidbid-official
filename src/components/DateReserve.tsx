@@ -59,7 +59,7 @@ export default function DateReserve({ onDateChange, onLocationChange }
   useEffect(() => {
     const fetchMassageShops = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/v1/massageShops')
+        const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/massageShops')
         const data = await res.json()
         setMassageShops(data.data || [])
 
