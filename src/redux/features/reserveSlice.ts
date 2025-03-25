@@ -14,7 +14,7 @@ export const reserveSlice = createSlice ({
         addReservation: ( state, action: PayloadAction<ReservationItem> ) => {
             const existingIndex = state.reserveItems.findIndex( obj => {
                 return (obj.massageShop === action.payload.massageShop) 
-                && (obj.reserveDate === action.payload.reserveDate)
+                && (obj.reservationDate === action.payload.reservationDate)
             })
 
             if(existingIndex !== -1) {
@@ -26,10 +26,10 @@ export const reserveSlice = createSlice ({
         },
         removeReservation: ( state, action: PayloadAction<ReservationItem> ) => {
             const remainItems = state.reserveItems.filter ( obj => {
-                return (obj.nameLastname !== action.payload.nameLastname)
-                || (obj.tel !== action.payload.tel)
+                return (obj.user.name !== action.payload.user.name)
+                || (obj.user.phoneNumber !== action.payload.user.phoneNumber)
                 || (obj.massageShop !== action.payload.massageShop)
-                || (obj.reserveDate !== action.payload.reserveDate)
+                || (obj.reservationDate !== action.payload.reservationDate)
             } )
             state.reserveItems = remainItems
         }
