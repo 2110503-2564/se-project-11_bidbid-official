@@ -28,7 +28,7 @@ export default function Reservation() {
     }
 
     try {
-      const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/massageShops/${massageShopId}/reservations`, {
+      const res = await fetch(`https://backend-may-i-scan.vercel.app/api/v1/massageShops/${massageShopId}/reservations`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${session.accessToken}`,

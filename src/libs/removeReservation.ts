@@ -1,5 +1,5 @@
 const removeReservation = async (id: string, token: string) => {
-    const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${id}`, {
+    const res = await fetch(`https://backend-may-i-scan.vercel.app/api/v1/reservations/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,

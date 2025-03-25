@@ -5,7 +5,7 @@ const updateReservation = async (
     token: string
   ): Promise<void> => {
     const res = await fetch(
-      `http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${reservationId}`,
+      `https://backend-may-i-scan.vercel.app/api/v1/reservations/${reservationId}`,
       {
         method: 'PUT',
         headers: {
