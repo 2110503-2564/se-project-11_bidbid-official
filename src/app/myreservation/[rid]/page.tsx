@@ -40,33 +40,6 @@ export default function UpdateReservationPage() {
       }
     }
 
-    // const fetchReservation = async () => {
-    //   try {
-    //     const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
-    //       headers: {
-    //         Authorization: `Bearer ${session?.accessToken}`,
-    //         'Content-Type': 'application/json',
-    //       },
-    //     })
-
-    //     if (!res.ok) throw new Error('Failed to fetch reservation')
-
-    //     const data = await res.json()
-    //     const reservation = data.data
-    //     setPreviousShop(reservation.massageShop.name)
-    //     setPreviousDate(dayjs(reservation.reservationDate).format('YYYY-MM-DD'))
-    //     setMassageShopId(reservation.massageShop._id)
-    //     setReservationDate(dayjs(reservation.reservationDate))
-    //   } catch (err) {
-    //     console.error('Error fetching reservation:', err)
-    //   }
-    // }
-
-    // const fetchShops = async () => {
-    //   const res = await fetch('http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/massageShops')
-    //   const data = await res.json()
-    //   setShops(data.data || [])
-    // }
 
     const fetchShops = async () => {
       try {

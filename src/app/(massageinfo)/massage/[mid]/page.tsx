@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import getMassageShop from '@/libs/getMassageShop'
 import addReview from '@/libs/addReview'
+import getMassageShopReview from '@/libs/getMassageShopReview'
 
 export default function MassageDetailPage({ params }: { params: { mid: string } }) {
   const router = useRouter()
@@ -17,27 +18,39 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
   const [hasReviewed, setHasReviewed] = useState(false) // Track if the user has already reviewed
 
   useEffect(() => {
-    const fetchMassage = async () => {
+    const fetchMassageAndReviews = async () => {
       try {
-        const res = await getMassageShop(params.mid)
-        setMassage(res.data)
-
+        const shopRes = await getMassageShop(params.mid)
+        const reviewsRes = await getMassageShopReview(params.mid)
+  
+        const combined = {
+          ...shopRes.data,
+          reviews: reviewsRes.data || [],
+        }
+  
+        setMassage(combined)
+  
         // Check if the logged-in user has already reviewed the shop
-        if (session?.user && res.data.reviews) {
-          const userReview = res.data.reviews.find(
+        if (session?.user) {
+          const userReview = reviewsRes.data.find(
             (r: any) => r.user?._id === session.user.id
           )
-          setHasReviewed(!!userReview) // Set `hasReviewed` to true if a review exists
+          setHasReviewed(!!userReview)
         }
+  
+        console.log("Reviews:", reviewsRes.data)
       } catch (error) {
-        console.error('Failed to fetch massage shop:', error)
+        console.error('Failed to fetch massage shop or reviews:', error)
       } finally {
         setLoading(false)
       }
     }
-
-    fetchMassage()
-  }, [params.mid, session]) // Re-run when `params.mid` or `session` changes
+  
+    if (params.mid && session) {
+      fetchMassageAndReviews()
+    }
+  }, [params.mid, session])
+  
 
   const handleReviewSubmit = async () => {
     if (!session?.accessToken) {
@@ -55,7 +68,7 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
       // Update the reviews state to include the new review
       setMassage((prevMassage: any) => ({
         ...prevMassage,
-        reviews: [newReview.data, ...prevMassage.reviews], // Add the new review to the beginning of the reviews array
+        reviews: [newReview.data, ...(prevMassage.reviews || [])], // Add the new review to the beginning of the reviews array
       }))
     } catch (error) {
       console.error('Failed to submit review:', error)
@@ -71,9 +84,12 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
     return <div className="text-center p-5 text-red-500">Massage shop not found.</div>
   }
 
+  {console.log("Reviews:", massage.reviews)}
+
+
   return (
     <main className="text-center p-5">
-      <h1 className="text-lg font-medium">{massage.name}</h1>
+      <h1 className="text-2xl font-medium">{massage.name}</h1>
       <div className="flex flex-row my-5">
         <Image
           src={massage.picture}
@@ -83,14 +99,14 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
           sizes="100vw"
           className="rounded-lg w-[30%]"
         />
-        <div className="text-medium mx-5 text-left">
-          <div className="text-medium mx-5">Name: {massage.name}</div>
-          <div className="text-medium mx-5">Address: {massage.address}</div>
-          <div className="text-medium mx-5">Price Range: {massage.priceRange}</div>
-          <div className="text-medium mx-5">Tel: {massage.phoneNumber}</div>
-          <div className="text-medium mx-5">Open Time: {massage.openTime}</div>
-          <div className="text-medium mx-5">Close Time: {massage.closeTime}</div>
-          <div className="flex space-x-3 mx-5 my-3">
+        <div className="text-lg mx-5 text-left bg-slate-200 rounded p-5 mr-0 w-full space-y-1">
+          <div className="text-medium">Name: {massage.name}</div>
+          <div className="text-medium">Address: {massage.address}</div>
+          <div className="text-medium">Price Range: {massage.priceRange}</div>
+          <div className="text-medium">Tel: {massage.phoneNumber}</div>
+          <div className="text-medium">Open Time: {massage.openTime}</div>
+          <div className="text-medium">Close Time: {massage.closeTime}</div>
+          <div className="flex space-x-3 my-3">
             {/* Reserve Button */}
             <button
               onClick={() => router.push('/reservation')}
@@ -119,7 +135,7 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
               className={`px-3 py-1 rounded border ${
                 hasReviewed
                   ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-green-600 text-white hover:bg-white hover:border-green-600 hover:text-green-600 active:bg-white active:border-green-600 active:text-green-600 active:scale-95'
+                  : 'bg-green-600 text-white border border-transparent hover:bg-white hover:border-green-600 hover:text-green-600 active:bg-white active:border-green-600 active:text-green-600 active:scale-95'
               }`}
               disabled={hasReviewed} // Disable the button if the user has already reviewed
             >
@@ -130,24 +146,26 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
       </div>
 
       {/* Reviews Section */}
-      <div className="mt-5">
-        <h2 className="text-lg font-medium">{massage.name}'s Reviews</h2>
-        {massage.reviews && massage.reviews.length > 0 ? (
-          <ul className="mt-3">
-            {massage.reviews.map((review: any) => (
-              <li key={review._id} className="border-b py-2">
-                <p className="font-medium">Rating: {'⭐'.repeat(review.rating)}</p>
-                <p>Review: {review.comment}</p>
-                <p className="text-sm text-gray-500">
-                  By {review.user?.name || 'Anonymous'} on {new Date(review.createdAt).toLocaleDateString()}
-                </p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No reviews available for this massage shop.</p>
-        )}
-      </div>
+    <div className="mt-5 bg-slate-200 rounded p-5 flex flex-col items-center">
+      <h2 className="text-2xl font-medium">{massage.name}'s Reviews</h2>
+      {massage.reviews && massage.reviews.length > 0 ? (
+        <ul className="mt-3 bg-white w-[50%] mx-auto rounded">
+          {massage.reviews.map((review: any) => (
+            <li key={review._id} className="border-b py-2 text-center">
+              <p className="font-medium">Rating: {'⭐'.repeat(review.rating)}</p>
+              <p>Review: {review.comment}</p>
+              <p className="text-sm text-gray-500">
+                By {review.user?.name || 'Anonymous'} on{' '}
+                {new Date(review.createdAt).toLocaleDateString()}
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-center">No reviews available for this massage shop.</p>
+      )}
+    </div>
+
 
       {/* Review Modal */}
       {isModalOpen && (

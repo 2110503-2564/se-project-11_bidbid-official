@@ -11,7 +11,7 @@ export default function Massage(){
 
     return(
         <main className="text-center p-5">
-            <h1 className="text-xl font-medium">Select Your Massage Shop</h1>
+            <h1 className="text-2xl font-medium">Select Your Massage Shop</h1>
             <Suspense fallback={ <p>Loading ... <LinearProgress/></p>}>
                 {/* <VenueCatalog massageJson={massages} /> */}
                 <MassageCatalog massageJson={massages} />

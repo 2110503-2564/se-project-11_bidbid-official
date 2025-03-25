@@ -1,37 +1,3 @@
-// import styles from './topmenu.module.css'
-// import Image from 'next/image';
-// import TopMenuItem from './TopMenuItem';
-// import { getServerSession } from 'next-auth';
-// import { authOptions } from '@/app/api/auth/[...nextauth]/authOptions';
-// import { Link } from '@mui/material';
-
-// export default async function TopMenu() {
-
-//     const session = await getServerSession(authOptions)
-
-//     return (
-//         <div className='fixed top-0 left-0 right-0 z-30 h-[50px] flex flex-row bg-white border-b border-gray-300 justify-end'>
-//             <div className='flex flex-row absolute left-0 h-full w-full'>
-//             {
-//                 session? <Link href="/api/auth/signout">
-//                     <div className='flex items-center absolute left-0 h-full px-2 text-cyan-600 text-sm'>
-//                     Sign-Out of {session.user?.name} </div></Link>
-//                 : <Link href="/api/auth/signin">
-//                     <div className='flex items-center absolute left-0 h-full px-2 text-cyan-600 text-sm'>
-//                     Sign-In</div></Link>
-//             }
-//             <TopMenuItem title='My Booking' pageRef='/mybooking' />
-//             </div>
-
-//             <TopMenuItem title='Booking' pageRef='/booking' />
-//             <Image 
-//                 src={'/img/logo.png'} 
-//                 className='h-100% w-auto'
-//                 alt='logo' width={0} height={0} sizes="100vh" 
-//             />
-//         </div>
-//     );
-// }
 'use client'
 import styles from './topmenu.module.css';
 import Image from 'next/image';
@@ -70,7 +36,7 @@ export default function TopMenu() {
 
                 <div className="flex flex-row gap-0">
                     <TopMenuItem title='My Reservation' pageRef='/myreservation' />
-                    <TopMenuItem title='My Review' pageRef='/myreview' />
+                    <TopMenuItem title='All Review' pageRef='/myreview' />
                 </div>
             </div>
 
