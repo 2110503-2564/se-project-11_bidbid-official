@@ -1,6 +1,7 @@
 const getMassageShopReview = async (mid: string) => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const res = await fetch(
-      `https://backend-may-i-scan.vercel.app/api/v1/massageShops/${mid}/reviews`
+      `${baseUrl}/api/v1/massageShops/${mid}/reviews`
     )
   
     if (!res.ok) {

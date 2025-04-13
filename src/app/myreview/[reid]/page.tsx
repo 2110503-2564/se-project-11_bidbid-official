@@ -36,6 +36,10 @@ export default function UpdateReviewPage() {
     if (session?.accessToken) {
       fetchReview()
     }
+
+    console.log('reid:', reid)
+  console.log('session:', session)
+
   }, [session, reid])
 
   const handleUpdate = async () => {

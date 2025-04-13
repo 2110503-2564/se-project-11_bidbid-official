@@ -12,10 +12,10 @@ export default function ReviewList() {
   const router = useRouter()
 
   const fetchReviews = async () => {
-    if (!session?.accessToken) return
+    // if (!session?.accessToken) return
 
     try {
-      const reviewsData = await getReviews(session.accessToken)
+      const reviewsData = await getReviews(session?.accessToken || '')
       setReviews(reviewsData || [])
     } catch (err) {
       console.error('Error fetching reviews:', err)
@@ -41,10 +41,15 @@ export default function ReviewList() {
     router.push(`/myreview/${id}`)
   }
 
+  // useEffect(() => {
+  //   if (!session?.accessToken) return
+  //   fetchReviews()
+  // }, [session])
+
   useEffect(() => {
-    if (!session?.accessToken) return
     fetchReviews()
   }, [session])
+  
 
   return (
     <div>

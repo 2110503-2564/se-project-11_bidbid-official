@@ -123,7 +123,7 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
               onClick={() => {
                 if (!session) {
                   alert('You must be logged in to write a review.')
-                  router.push('/auth/signin') // Redirect to login page
+                  router.push('/api/auth/signin') // Redirect to login page
                   return
                 }
                 if (hasReviewed) {

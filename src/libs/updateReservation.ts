@@ -4,8 +4,9 @@ const updateReservation = async (
     massageShopId: string,
     token: string
   ): Promise<void> => {
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const res = await fetch(
-      `https://backend-may-i-scan.vercel.app/api/v1/reservations/${reservationId}`,
+      `${baseUrl}/api/v1/reservations/${reservationId}`,
       {
         method: 'PUT',
         headers: {

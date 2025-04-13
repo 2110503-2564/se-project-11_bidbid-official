@@ -4,8 +4,9 @@ const updateReview = async (
   comment: string,
   token: string
 ): Promise<void> => {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const res = await fetch(
-    `https://backend-may-i-scan.vercel.app/api/v1/reviews/${reviewId}`,
+    `${baseUrl}/api/v1/reviews/${reviewId}`,
     {
       method: 'PUT',
       headers: {

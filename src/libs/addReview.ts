@@ -4,7 +4,8 @@ const addReview = async (
     accessToken: string // Add accessToken parameter
   ) => {
     try {
-      const response = await fetch(`https://backend-may-i-scan.vercel.app/api/v1/massageShops/${massageShopId}/reviews`, {
+      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${baseUrl}/api/v1/massageShops/${massageShopId}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
