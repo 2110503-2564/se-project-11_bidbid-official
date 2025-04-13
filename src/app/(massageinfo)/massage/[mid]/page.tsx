@@ -46,7 +46,7 @@ export default function MassageDetailPage({ params }: { params: { mid: string } 
       }
     }
   
-    if (params.mid && session) {
+    if (params.mid) {
       fetchMassageAndReviews()
     }
   }, [params.mid, session])
