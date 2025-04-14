@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import registerUser from '@/libs/register'
 
 export default function SignUpPage() {
-  const router = useRouter()
-
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,7 +16,8 @@ export default function SignUpPage() {
     try {
       await registerUser({ name, email, password, phoneNumber })
       alert('Account created successfully!')
-      router.push('/api/auth/signin')
+      // Use location.href to redirect to signin since it's outside the app route
+      window.location.href = '/api/auth/signin'
     } catch (err: any) {
       alert(err.message || 'Failed to create account.')
     }
@@ -62,7 +61,7 @@ export default function SignUpPage() {
               Phone Number
             </label>
             <input
-              type="phoneNumber"
+              type="text"
               name="phoneNumber"
               value={phoneNumber}
               onChange={e => setPhoneNumber(e.target.value)}
@@ -91,6 +90,13 @@ export default function SignUpPage() {
           >
             Create Account
           </button>
+
+          <div className="text-center text-sm text-gray-600 mt-4">
+            Are you a therapist?{' '}
+            <Link href="/api/auth/signupTherapist" className="text-blue-600 hover:underline">
+              Register Here
+            </Link>
+          </div>
         </form>
       </div>
     </div>

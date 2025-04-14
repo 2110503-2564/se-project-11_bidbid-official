@@ -1,6 +1,7 @@
 'use client'
 
 import DateReserve from "@/components/DateReserve"
+import { useRouter } from 'next/navigation'
 import { TextField } from "@mui/material"
 import { useSearchParams } from "next/navigation"
 import { useState } from "react"
@@ -8,6 +9,7 @@ import dayjs, { Dayjs } from "dayjs"
 import { useSession } from "next-auth/react"
 
 export default function Reservation() {
+  const router = useRouter()
   const { data: session } = useSession()
   const [nameLastname, setNameLastname] = useState<string>("")
   const [tel, setTel] = useState<string>("")
@@ -17,6 +19,7 @@ export default function Reservation() {
   const handleReservation = async () => {
     if (!session?.accessToken) {
       alert("You must be logged in.")
+      router.push('/api/auth/signin') // Redirect to login page
       return
     }
 
