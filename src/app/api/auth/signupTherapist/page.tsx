@@ -1,0 +1,252 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+
+export default function TherapistSignUpPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    gender: 'Female',
+    phoneNumber: '',
+    email: '',
+    password: '',
+    experience: '',
+    specialities: '',
+    massageShop_name: '',
+    massageShopID: null,
+    notAvailableDays: [] as string[],
+  })
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleCheckboxChange = (day: string) => {
+    setFormData(prev => {
+      const updated = prev.notAvailableDays.includes(day)
+        ? prev.notAvailableDays.filter(d => d !== day)
+        : [...prev.notAvailableDays, day]
+      return { ...prev, notAvailableDays: updated }
+    })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const response = await fetch('http://localhost:5000/api/v1/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          workingInfo: [{
+            massageShopID: null,
+            massageShop_name: formData.massageShop_name,
+          }],
+          role: 'therapist',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create account')
+      }
+
+      const result = await response.json()
+      console.log('Server response:', result)
+      alert('Account created successfully!')
+      setFormData({
+        name: '',
+        gender: 'Female',
+        phoneNumber: '',
+        email: '',
+        password: '',
+        experience: '',
+        specialities: '',
+        massageShop_name: '',
+        massageShopID: null,
+        notAvailableDays: [],
+      })
+      
+    } catch (err: any) {
+      console.error(err)
+      alert(err.message || 'Failed to create account.')
+    }
+  }
+
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex justify-center items-start pt-10">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-3xl">
+        <h2 className="text-2xl font-bold text-center mb-8">
+          Sign Up for therapist
+        </h2>
+
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name
+            </label>
+            <input
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Gender
+            </label>
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            >
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
+            <input
+              name="phoneNumber"
+              type="tel"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              pattern="[0-9]{10}"
+              maxLength={10}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              placeholder="XXXXXXXXXX"
+            />
+          </div>
+
+          <div>{/* Empty column to move Email + Password to next row */}</div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              placeholder="example@gmail.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Years of experience
+            </label>
+            <input
+              name="experience"
+              type="number"
+              min="0"
+              step="1"
+              value={formData.experience}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              placeholder="answer in year at least 0"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Specialities
+            </label>
+            <input
+              name="specialities"
+              type="text"
+              value={formData.specialities}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              MassageShop
+            </label>
+            <input
+              name="massageShop_name"
+              type="text"
+              value={formData.massageShop_name}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          {/* Checkboxes */}
+          <div className="md:col-span-2">
+            <p className="text-sm font-medium text-gray-700 mb-2">
+              Check in the checkbox for your Not Available Day
+            </p>
+            <div className="flex flex-wrap gap-4">
+              {days.map(day => (
+                <label key={day} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.notAvailableDays.includes(day)}
+                    onChange={() => handleCheckboxChange(day)}
+                    className="accent-blue-600 w-4 h-4"
+                  />
+                  <span className="text-sm text-gray-800">{day}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              className="w-full bg-blue-700 text-white py-2 rounded-md hover:bg-blue-800 transition"
+            >
+              Create an Account
+            </button>
+          </div>
+
+          <div className="md:col-span-2 text-center text-sm text-gray-700">
+            Are you a customer?{' '}
+            <Link href="/api/auth/signup" className="text-blue-700 hover:underline">
+              Sign Up for customer here
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
