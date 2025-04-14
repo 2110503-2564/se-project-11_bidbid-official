@@ -7,6 +7,7 @@ export default function TherapistSignUpPage() {
   const [formData, setFormData] = useState({
     name: '',
     gender: 'Female',
+    age : '',
     phoneNumber: '',
     email: '',
     password: '',
@@ -14,6 +15,7 @@ export default function TherapistSignUpPage() {
     specialities: '',
     massageShop_name: '',
     massageShopID: null,
+    licenseNumber: '',
     notAvailableDays: [] as string[],
   })
 
@@ -61,6 +63,7 @@ export default function TherapistSignUpPage() {
       setFormData({
         name: '',
         gender: 'Female',
+        age: 'age',
         phoneNumber: '',
         email: '',
         password: '',
@@ -68,6 +71,7 @@ export default function TherapistSignUpPage() {
         specialities: '',
         massageShop_name: '',
         massageShopID: null,
+        licenseNumber: '',
         notAvailableDays: [],
       })
       
@@ -136,7 +140,21 @@ export default function TherapistSignUpPage() {
             />
           </div>
 
-          <div>{/* Empty column to move Email + Password to next row */}</div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Age
+              </label>
+              <input
+                name="age"
+                type="number"
+                min="18"
+                step="1"
+                value={formData.age}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              />
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -197,7 +215,7 @@ export default function TherapistSignUpPage() {
             />
           </div>
 
-          <div className="md:col-span-2">
+          <div >
             <label className="block text-sm font-medium text-gray-700 mb-1">
               MassageShop
             </label>
@@ -205,6 +223,20 @@ export default function TherapistSignUpPage() {
               name="massageShop_name"
               type="text"
               value={formData.massageShop_name}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+            
+          </div>
+
+          <div >
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              License Number
+            </label>
+            <input
+              name="licenseNumber"
+              type="text"
+              value={formData.licenseNumber}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
