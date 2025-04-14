@@ -1,9 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
+type MassageShop = {
+  _id: string
+  name: string
+}
+
 export default function TherapistSignUpPage() {
+
+  const [massageShops, setMassageShops] = useState<MassageShop[]>([])
   const [formData, setFormData] = useState({
     name: '',
     gender: 'Female',
@@ -14,10 +21,26 @@ export default function TherapistSignUpPage() {
     experience: '',
     specialities: '',
     massageShop_name: '',
-    massageShopID: null,
+    massageShopID: '',
     licenseNumber: '',
     notAvailableDays: [] as string[],
   })
+
+  useEffect(() => {
+    const fetchMassageShops = async () => {
+      try {
+        const res = await fetch('https://backend-may-i-scan.vercel.app/api/v1/massageShops')
+        const data = await res.json()
+
+        const shops = Array.isArray(data.data) ? data.data : []
+        setMassageShops(shops)
+      } catch (err) {
+        console.error("Error fetching", err)
+      }
+    }
+
+    fetchMassageShops()
+  }, [])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -38,7 +61,7 @@ export default function TherapistSignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/register', {
+      const response = await fetch('http://localhost:5003/api/v1/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +69,7 @@ export default function TherapistSignUpPage() {
         body: JSON.stringify({
           ...formData,
           workingInfo: [{
-            massageShopID: null,
+            massageShopID: formData.massageShopID,
             massageShop_name: formData.massageShop_name,
           }],
           role: 'therapist',
@@ -70,7 +93,7 @@ export default function TherapistSignUpPage() {
         experience: '',
         specialities: '',
         massageShop_name: '',
-        massageShopID: null,
+        massageShopID: '',
         licenseNumber: '',
         notAvailableDays: [],
       })
@@ -216,17 +239,36 @@ export default function TherapistSignUpPage() {
           </div>
 
           <div >
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              MassageShop
-            </label>
-            <input
-              name="massageShop_name"
-              type="text"
-              value={formData.massageShop_name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
-            />
-            
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+                MassageShop
+              </label>
+              <select
+                name="massageShopID"
+                value={formData.massageShopID}
+                onChange={(e) => {
+                  const selectedId = e.target.value
+                  const selectedShop = massageShops.find(shop => shop._id === selectedId)
+                  setFormData(prev => ({
+                    ...prev,
+                    massageShopID: selectedId,
+                    massageShop_name: selectedShop?.name || ''
+                  }))
+                }}
+                required
+                className="border px-2 py-1 rounded w-full"
+              >
+                {/* ✅ option นี้ใช้เป็น placeholder และเลือกไม่ได้ */}
+                <option value="" disabled hidden>
+                  Select a massage shop
+                </option>
+
+                {massageShops.map(shop => (
+                  <option key={shop._id} value={shop._id}>
+                    {shop.name}
+                  </option>
+                ))}
+              </select>
+
           </div>
 
           <div >
