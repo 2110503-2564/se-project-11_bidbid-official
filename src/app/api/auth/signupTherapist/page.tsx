@@ -61,7 +61,8 @@ export default function TherapistSignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch('http://localhost:5003/api/v1/auth/register', {
+      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
