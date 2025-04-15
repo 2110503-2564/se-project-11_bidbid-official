@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import getTherapist from '@/libs/getTherapist'
+import getMe from '@/libs/getMe'
 import updateTherapist from '@/libs/updateTherapist'
 
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -32,12 +33,16 @@ export default function UpdateTherapistPage() {
     email: '',
   })
 
+  const role = session?.user?.role;
+  const isAdmin = role === 'admin';
+
   useEffect(() => {
     const fetchTherapist = async () => {
       if (!session?.accessToken || !tid) return
 
       try {
         const data = await getTherapist(tid as string, session.accessToken)
+        // const data = await getMe(session.accessToken)
 
         setName(data.user?.name || '')
         setPhoneNumber(data.user?.phoneNumber || '')
@@ -71,31 +76,85 @@ export default function UpdateTherapistPage() {
     )
   }
 
-  const handleUpdate = async () => {
-    if (!session?.accessToken) return
+  // const handleUpdate = async () => {
+  //   if (!session?.accessToken) return
 
+  //   try {
+  //     const newStatus = !isAdmin && status === 'rejected' ? 'pending' : status;
+
+  //     await updateTherapist(
+  //       tid as string,
+  //       {
+  //         gender,
+  //         age,
+  //         experience,
+  //         specialities,
+  //         licenseNumber,
+  //         notAvailableDays,
+  //         state: newStatus, // include status in the update
+  //       },
+  //       session.accessToken
+  //     )
+
+  //     alert('Therapist profile updated successfully')
+  //     // router.push(`/therapist/profile`)
+  //     if (isAdmin) {
+  //       router.push('/therapist');
+  //     } else {
+  //       router.push('/therapist/profile');
+  //     }
+  //   } catch (err) {
+  //     console.error('Update error:', err)
+  //     alert('Failed to update therapist profile')
+  //   }
+  // }
+
+  const handleUpdate = async () => {
+    if (!session?.accessToken) return;
+  
     try {
+      const updatePayload: any = {
+        gender,
+        age,
+        experience,
+        specialities,
+        licenseNumber,
+        notAvailableDays,
+      };
+  
+      if (!isAdmin && status === 'rejected') {
+        updatePayload.state = 'pending';
+      }
+  
+      if (isAdmin) {
+        updatePayload.state = status;
+      }
+  
       await updateTherapist(
         tid as string,
-        {
-          gender,
-          age,
-          experience,
-          specialities,
-          licenseNumber,
-          notAvailableDays,
-        },
+        updatePayload,
         session.accessToken
-      )
-      alert('Therapist profile updated successfully')
-      router.push(`/therapist/profile`)
+      );
+  
+      alert('Therapist profile updated successfully');
+  
+      if (isAdmin) {
+        router.push('/therapist');
+      } else {
+        router.push('/therapist/profile');
+      }
     } catch (err) {
-      console.error('Update error:', err)
-      alert('Failed to update therapist profile')
+      console.error('Update error:', err);
+      alert('Failed to update therapist profile');
     }
-  }
+  };
+  
+  
 
-  const isEditable = status !== 'verified'
+  // const isEditable = status !== 'verified'
+  const isEditable = true; // all general fields editable
+  const canEditRestrictedFields = isAdmin || status !== 'verified';
+  const canEditLicense = status !== 'verified';
 
   return (
     <div className="min-h-screen bg-gray-200 py-10">
@@ -147,7 +206,7 @@ export default function UpdateTherapistPage() {
             <label>Specialities</label>
             <input value={specialities} onChange={(e) => setSpecialities(e.target.value)} className="w-full border px-3 py-2 rounded" />
           </div>
-          <div>
+          {/* <div>
             <label className={isEditable ? '' : 'text-gray-400'}>MassageShop</label>
             <select
               value={massageShop}
@@ -158,34 +217,66 @@ export default function UpdateTherapistPage() {
               <option value="Serenity Spa">Serenity Spa</option>
               <option value="Another Spa">Another Spa</option>
             </select>
-          </div>
+          </div> */}
+
           <div>
-            <label className={isEditable ? '' : 'text-gray-400'}>License Number</label>
+            <label className={canEditRestrictedFields ? '' : 'text-gray-400'}>MassageShop</label>
+            <select
+              value={massageShop}
+              onChange={(e) => setMassageShop(e.target.value)}
+              disabled={!canEditRestrictedFields}
+              className={`w-full border px-3 py-2 rounded ${!canEditRestrictedFields ? 'bg-gray-200' : ''}`}
+            >
+              <option value="Serenity Spa">Serenity Spa</option>
+              <option value="Another Spa">Another Spa</option>
+            </select>
+          </div>
+
+          <div>
+            <label className={canEditLicense ? '' : 'text-gray-400'}>License Number</label>
             <input
               value={licenseNumber}
               onChange={(e) => setLicenseNumber(e.target.value)}
-              disabled={!isEditable}
-              className={`w-full border px-3 py-2 rounded ${!isEditable ? 'bg-gray-200' : ''}`}
+              disabled={!canEditLicense}
+              className={`w-full border px-3 py-2 rounded ${!canEditLicense ? 'bg-gray-200' : ''}`}
             />
           </div>
+
+          <div className="col-span-2">
+            <label className={`block font-medium mb-1 ${!isAdmin ? 'text-gray-400' : ''}`}>
+              State
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              disabled={!isAdmin}
+              className={`w-full border px-3 py-2 rounded ${!isAdmin ? 'bg-gray-200 text-gray-500' : ''}`}
+            >
+              <option value="pending">Pending</option>
+              <option value="verified">Verified</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+
         </div>
 
         <div className="mt-6">
-          <label className={`block mb-2 ${!isEditable ? 'text-gray-400' : ''}`}>Select Not Available Days</label>
+          <label className={`block mb-2 ${!canEditRestrictedFields ? 'text-gray-400' : ''}`}>Select Not Available Days</label>
           <div className="grid grid-cols-4 gap-2">
             {weekdays.map((day) => (
-              <label key={day} className={`flex items-center space-x-2 ${!isEditable ? 'text-gray-400' : ''}`}>
+              <label key={day} className={`flex items-center space-x-2 ${!canEditRestrictedFields ? 'text-gray-400' : ''}`}>
                 <input
                   type="checkbox"
                   checked={notAvailableDays.includes(day)}
                   onChange={() => handleCheckboxChange(day)}
-                  disabled={!isEditable}
+                  disabled={!canEditRestrictedFields}
                 />
                 <span>{day}</span>
               </label>
             ))}
           </div>
         </div>
+
 
         <div className="mt-6 text-center">
           <button

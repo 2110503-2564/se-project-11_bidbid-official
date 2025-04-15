@@ -36,13 +36,22 @@ export default function TopMenu() {
 
           {session && (role === 'user' || role === 'admin') && (
             <TopMenuItem
-              title={role === 'admin' ? 'All Reservation' : 'My Reservation'}
+              title={role === 'admin' ? 'Manage Reservation' : 'My Reservation'}
               pageRef='/myreservation'
             />
           )}
 
+          {session && role === 'admin' && (
+            <TopMenuItem
+              title='Manage Therapists' pageRef='/therapist'
+            />
+          )}
+
           {/* Shared */}
-          <TopMenuItem title='All Review' pageRef='/myreview' />
+          <TopMenuItem 
+            // title='All Review' 
+            title={role === 'admin' ? 'Manage Review' : 'All Review'}
+            pageRef='/myreview' />
         </div>
       </div>
 
