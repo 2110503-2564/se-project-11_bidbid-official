@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation';
 
 type MassageShop = {
   _id: string
@@ -9,7 +10,8 @@ type MassageShop = {
 }
 
 export default function TherapistSignUpPage() {
-
+  const router = useRouter();
+  
   const [massageShops, setMassageShops] = useState<MassageShop[]>([])
   const [formData, setFormData] = useState({
     name: '',
@@ -29,7 +31,8 @@ export default function TherapistSignUpPage() {
   useEffect(() => {
     const fetchMassageShops = async () => {
       try {
-        const res = await fetch('https://backend-may-i-scan.vercel.app/api/v1/massageShops')
+        const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+        const res = await fetch(`${baseUrl}/api/v1/massageShops`)
         const data = await res.json()
 
         const shops = Array.isArray(data.data) ? data.data : []
@@ -84,6 +87,8 @@ export default function TherapistSignUpPage() {
       const result = await response.json()
       console.log('Server response:', result)
       alert('Account created successfully!')
+
+      // clear form data
       setFormData({
         name: '',
         gender: 'Female',
@@ -98,6 +103,8 @@ export default function TherapistSignUpPage() {
         licenseNumber: '',
         notAvailableDays: [],
       })
+
+      router.push('/api/auth/signin');
       
     } catch (err: any) {
       console.error(err)
