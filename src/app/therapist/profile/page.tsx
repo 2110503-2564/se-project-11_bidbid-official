@@ -3,8 +3,10 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import getMe from '@/libs/getMe'
 
 type Therapist = {
+  _id: string
   gender: string
   age: string
   experience: number
@@ -33,28 +35,20 @@ export default function TherapistProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!session?.accessToken) return
-
+      if (!session?.accessToken) return;
+    
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${session.accessToken}`,
-          },
-        })
-
-        const data = await res.json()
-        if (data.success && data.therapist && data.user) {
-          setTherapist(data.therapist)
-          setUser(data.user)
-        } else {
-          alert('Unauthorized or invalid role.')
-          router.push('/')
-        }
+        const data = await getMe(session.accessToken);
+        setTherapist(data.therapist);
+        setUser(data.user);
       } catch (err) {
-        console.error('Failed to fetch profile:', err)
-        alert('Error fetching profile')
+        alert((err as Error).message);
+        router.push('/');
       }
-    }
+
+      console.log('Therapist:', therapist)
+      console.log('User:', user)
+    };
 
     if (session?.user?.role === 'therapist') {
       fetchProfile()
@@ -109,7 +103,8 @@ export default function TherapistProfilePage() {
         {/* Button */}
         <div className="mt-6">
           <button
-            onClick={() => router.push('/therapist/profile/update')}
+            // onClick={() => router.push(`/therapist/${session?.user?.id}`)}
+            onClick={() => router.push(`/therapist/${therapist._id}`)}
             className="bg-blue-800 text-white px-3 py-1 rounded 
                 border border-transparent
                 hover:bg-white hover:border-blue-800 hover:text-blue-800 
