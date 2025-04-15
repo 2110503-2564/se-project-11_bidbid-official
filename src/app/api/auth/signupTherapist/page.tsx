@@ -87,7 +87,7 @@ export default function TherapistSignUpPage() {
       setFormData({
         name: '',
         gender: 'Female',
-        age: 'age',
+        age: '',
         phoneNumber: '',
         email: '',
         password: '',
