@@ -1,20 +1,19 @@
 export default async function addReservation(
-  userID: string,
-  user_name: string,
+  user: string,
   date: string,
   time: string,
   duration: number,
-  therapistID: string,
+  therapist: string,
   massageShopID: string,
   massageProgram: string,
   token: string
 ) {
-  console.log(userID);
-  console.log(user_name);
+  console.log(user);
+  // console.log(user_name);
   console.log(date);
   console.log(time);
   console.log(duration);
-  console.log(therapistID);
+  console.log(therapist);
   console.log(massageShopID);
   console.log(token);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -27,13 +26,12 @@ export default async function addReservation(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        userID,
-        user_name,
+        user,
         date,
         time,
         duration,
         massageProgram,
-        therapistID,
+        therapist,
       }),
     }
   );

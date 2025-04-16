@@ -63,7 +63,6 @@ export default function Reservation() {
     if (bookDate === null) return;
     await addReservation(
       session.user.id,
-      session.user.name,
       bookDate.toISOString(),
       "10:00",
       duration,
@@ -74,35 +73,12 @@ export default function Reservation() {
     );
   };
 
+
   return (
     <main className="min-h-screen bg-white flex flex-col items-center pt-10 px-4">
       <div className="text-xl font-semibold mb-4">Massage Reservation</div>
   
       <div className="bg-white border border-gray-200 rounded-lg shadow-md p-8 w-full max-w-2xl space-y-6">
-        {/* Name and Contact */}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="w-full">
-            <label className="block text-sm font-medium text-gray mb-1">Name-Lastname</label>
-            <TextField
-              fullWidth
-              variant="outlined"
-              size="small"
-              value={nameLastname}
-              onChange={(e) => setNameLastname(e.target.value)}
-            />
-
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contact-Number</label>
-            <TextField
-              fullWidth
-              variant="outlined"
-              size="small"
-              value={tel}
-              onChange={(e) => setTel(e.target.value)}
-            />
-          </div>
-        </div>
   
         {/* Massage Shop and Therapist */}
         <div className="grid grid-cols-2 gap-6">
@@ -129,6 +105,9 @@ export default function Reservation() {
               <option value="">Select therapist</option>
               {Therapists.map((th) => (
                 <option key={th._id} value={th._id}>{th.user.name}</option> 
+                //{/* ไม่ต้องแก้นะ */}
+                //{/* ไม่ต้องแก้นะ */}
+                //{/* ไม่ต้องแก้นะ */}
                 //{/* ไม่ต้องแก้นะ */}
               ))}
             </select>
