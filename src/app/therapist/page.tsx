@@ -5,6 +5,7 @@ import getPendingTherapists from '@/libs/getPendingTherapist';
 import getVerifiedTherapists from '@/libs/getVerifiedTherapist';
 import verifyTherapist from '@/libs/verifyTherapist';
 import rejectTherapist from '@/libs/rejectTherapist';
+import removeTherapist from '@/libs/removeTherapist';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -21,9 +22,9 @@ export default function TherapistListPage() {
       try {
         const pending = await getPendingTherapists(session.accessToken);
         const verified = await getVerifiedTherapists(session.accessToken);
-
+        
         setPendingTherapists(pending);
-        setVerifiedTherapists(verified);
+        setVerifiedTherapists(verified.therapists);
       } catch (error) {
         console.error('Error fetching therapists:', error);
       }
@@ -53,13 +54,32 @@ export default function TherapistListPage() {
     if (!session?.accessToken) return;
   
     try {
-      await rejectTherapist(id, session.accessToken);
+      await removeTherapist(id, session.accessToken);
       const updatedPending = pendingTherapists.filter(t => t._id !== id);
       setPendingTherapists(updatedPending);
       alert("Therapist rejected successfully.");
     } catch (error) {
       console.error('Rejection failed:', error);
       alert("Failed to reject therapist.");
+    }
+  };
+
+  const handleRemove = async (id: string) => {
+    if (!session?.accessToken) return;
+  
+    try {
+      await removeTherapist(id, session.accessToken);
+
+      const updatedPending = pendingTherapists.filter(t => t._id !== id);
+      const updatedVerified = verifiedTherapists.filter(t => t._id !== id);
+
+      setPendingTherapists(updatedPending);
+      setVerifiedTherapists(updatedVerified);
+
+      alert("Therapist remove successfully.");
+    } catch (error) {
+      console.error('Remove failed:', error);
+      alert("Failed to remove therapist.");
     }
   };
 
@@ -111,7 +131,11 @@ export default function TherapistListPage() {
         )}
 
 
-        <button className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
+        <button className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          onClick={() => {
+            const confirmed = window.confirm("Are you sure you want to delete this therapist?");
+            handleRemove(therapist._id);
+          }}>
           Delete Profile
         </button>
 

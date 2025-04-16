@@ -56,7 +56,7 @@ export default function ReservationList() {
       ) : (
         reservations.map((item) => (
           <div
-            className="bg-slate-200 rounded px-5 mx-auto py-5 my-5 flex justify-between items-center w-[50%]"
+            className="bg-slate-200 rounded-md px-5 mx-auto py-5 my-5 flex justify-between items-center w-[50%]"
             key={item._id}
           >
             {item.massageShop ? (
@@ -75,7 +75,7 @@ export default function ReservationList() {
                   
                   <button
                       onClick={() => handleUpdate(item._id)}
-                      className="bg-green-600 text-white px-3 py-1 rounded mr-3 
+                      className="bg-green-600 text-white px-3 py-1 rounded-md mr-3 
                       hover:bg-green-700 active:bg-green-700 active:scale-95"
                     >
                       Update Reservation
@@ -83,7 +83,7 @@ export default function ReservationList() {
 
                   <button
                     onClick={() => handleRemove(item._id)}
-                    className="mt-3 bg-red-600 text-white px-3 py-1 rounded 
+                    className="mt-3 bg-red-600 text-white px-3 py-1 rounded-md 
                     hover:bg-red-700 active:bg-red-700 active:scale-95"
                   >
                     Remove Reservation
