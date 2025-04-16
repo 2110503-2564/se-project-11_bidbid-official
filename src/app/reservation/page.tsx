@@ -75,111 +75,141 @@ export default function Reservation() {
   };
 
   return (
-    <main className="w-full flex flex-col items-center space-y-4">
-      <div className="px-5 py-5 text-2xl font-bold">
-        Massage Shop Reservation
-      </div>
-
-      <div className="bg-slate-100 rounded-lg px-10 py-5 flex flex-col space-y-4">
-        <div className="flex items-center space-x-4">
-          <TextField
-            fullWidth
-            name="Name-Lastname"
-            label="Name-Lastname"
-            variant="standard"
-            className="w-[400px]"
-            onChange={(e) => setNameLastname(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <TextField
-            name="Contact-Number"
-            label="Contact-Number"
-            variant="standard"
-            className="w-[400px]"
-            onChange={(e) => setTel(e.target.value)}
-          />
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <select
-            className="border-b border-gray-300 flex-1 focus:outline-none py-1"
-            value={massageShop}
-            onChange={(e) => setMassageShop(e.target.value)}
-          >
-            <option key="" value="">
-              Select a shop
-            </option>
-            {massageShops.map((shop) => (
-              <option key={shop._id} value={shop._id}>
-                {shop.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            className="border-b border-gray-300 flex-1 focus:outline-none py-1"
-            value={therapist}
-            onChange={(e) => setTherapist(e.target.value)}
-          >
-            <option value="">Select therapist</option>
-            {Therapists.map((th) => (
-              <option key={th._id} value={th._id}>
-                {th.user.name}
-                {/* ไม่ต้องแก้นะ */}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <select
-            className="border-b border-gray-300 flex-1 focus:outline-none py-1"
-            value={massageProgram}
-            onChange={(e) => setMassageProgram(e.target.value)}
-          >
-            <option value="">Select program</option>
-            <option value="footMassage">Foot Massage</option>
-            <option value="oilMassage">Oil Massage</option>
-          </select>
-
-          <TextField
-            variant="standard"
-            fullWidth
-            type="number"
-            value={duration}
-            onChange={(e) => {
-              const num = Number(e.target.value);
-              setDuration(num);
-            }}
-            inputProps={{ step: 0.5, min: 0.5 }}
-          />
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              className="bg-white w-full"
-              value={bookDate}
-              onChange={(value) => {
-                setBookDate(value);
-              }}
+    <main className="min-h-screen bg-white flex flex-col items-center pt-10 px-4">
+      <div className="text-xl font-semibold mb-4">Massage Reservation</div>
+  
+      <div className="bg-white border border-gray-200 rounded-lg shadow-md p-8 w-full max-w-2xl space-y-6">
+        {/* Name and Contact */}
+        <div className="grid grid-cols-2 gap-6">
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray mb-1">Name-Lastname</label>
+            <TextField
+              fullWidth
+              variant="outlined"
+              size="small"
+              value={nameLastname}
+              onChange={(e) => setNameLastname(e.target.value)}
             />
-          </LocalizationProvider>
-          <CustomTimePicker />
+
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Contact-Number</label>
+            <TextField
+              fullWidth
+              variant="outlined"
+              size="small"
+              value={tel}
+              onChange={(e) => setTel(e.target.value)}
+            />
+          </div>
+        </div>
+  
+        {/* Massage Shop and Therapist */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Massage Shop</label>
+            <select
+              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none"
+              value={massageShop}
+              onChange={(e) => setMassageShop(e.target.value)}
+            >
+              <option value="">Select a massage shop</option>
+              {massageShops.map((shop) => (
+                <option key={shop._id} value={shop._id}>{shop.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Therapist</label>
+            <select
+              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none"
+              value={therapist}
+              onChange={(e) => setTherapist(e.target.value)}
+            >
+              <option value="">Select therapist</option>
+              {Therapists.map((th) => (
+                <option key={th._id} value={th._id}>{th.user.name}</option> 
+                //{/* ไม่ต้องแก้นะ */}
+              ))}
+            </select>
+          </div>
+        </div>
+  
+        {/* Massage Program and Duration */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Massage Program</label>
+            <select
+              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none"
+              value={massageProgram}
+              onChange={(e) => setMassageProgram(e.target.value)}
+            >
+              <option value="">Select program</option>
+              <option value="footMassage">Foot Massage</option>
+              <option value="oilMassage">Oil Massage</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Duration (hour)</label>
+            <TextField
+              fullWidth
+              variant="outlined"
+              type="number"
+              size="small"
+              inputProps={{ step: 0.5, min: 0.5 }}
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+            />
+          </div>
+        </div>
+  
+        {/* Date and Time */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                value={bookDate}
+                onChange={(newValue) => setBookDate(newValue)}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    variant: "outlined",
+                    sx: {
+                      height: 40,
+                      '& .MuiInputBase-root': {
+                        height: 40,
+                      },
+                      '& input': {
+                        padding: '10px 14px',
+                      },
+                    },
+                  }
+                }}
+              />
+            </LocalizationProvider>
+            <p className="text-xs text-gray-500 mt-1">MM/DD/YYYY</p>
+          </div>
+          <div className="w-full max-w-[300px]">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+            <div className="h-[40px]">
+              <CustomTimePicker />
+            </div>
+</div>
+
+        </div>
+  
+        {/* Submit Button */}
+        <div className="flex justify-center">
+          <button
+            onClick={handleReservation}
+            className="bg-black text-white px-6 py-2 rounded-md hover:bg-white hover:text-black border border-black transition duration-200"
+          >
+            Submit
+          </button>
         </div>
       </div>
-
-      <button
-        name="Reserve Massage"
-        className="block rounded-md bg-blue-800 px-3 py-2 text-white shadow-sm 
-          border border-transparent
-          hover:bg-white hover:border-blue-800 hover:text-blue-800
-          active:bg-white active:border-blue-800 active:text-blue-800 active:scale-95"
-        onClick={handleReservation}
-      >
-        Reserve Massage
-      </button>
     </main>
   );
+  
 }

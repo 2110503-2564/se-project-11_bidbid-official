@@ -22,22 +22,22 @@ export default function CustomTimePicker() {
     .padStart(2, "0")}`;
 
   return (
-    <div className="bg-white p-6 rounded shadow flex gap-2 items-center">
+    <div className="bg-white w-full max-w-[300px] h-[40px] rounded flex items-center gap-2">
       <input
         type="number"
         value={hour}
         min={8}
         max={17}
         onChange={handleHourChange}
-        className="w-20 p-2 border rounded text-center"
+        className="w-[60px] h-full text-sm text-center focus:outline-none rounded border border-gray-300"
       />
 
-      <span className="text-xl">:</span>
+      <span className="text-sm">:</span>
 
       <select
         value={minute}
         onChange={handleMinuteChange}
-        className="w-20 p-2 border rounded text-center"
+        className="w-[60px] h-full text-sm text-center focus:outline-none rounded border border-gray-300"
       >
         <option value={0}>00</option>
         <option value={30}>30</option>
