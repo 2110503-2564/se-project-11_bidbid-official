@@ -52,6 +52,10 @@ export default function TopMenu() {
             // title='All Review' 
             title={role === 'admin' ? 'Manage Review' : 'All Review'}
             pageRef='/myreview' />
+            <TopMenuItem 
+            // title='All Review' 
+            title={'View Profile'}
+            pageRef='/profile' />
         </div>
       </div>
 
