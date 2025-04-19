@@ -1,5 +1,5 @@
 export default async function addReservation(
-  user: string,
+  // user: string,
   date: string,
   time: string,
   duration: number,
@@ -8,7 +8,7 @@ export default async function addReservation(
   massageProgram: string,
   token: string
 ) {
-  console.log(user);
+  // console.log(user);
   // console.log(user_name);
   console.log(date);
   console.log(time);
@@ -26,12 +26,13 @@ export default async function addReservation(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        user,
+        // user,
         date,
         time,
         duration,
         massageProgram,
         therapist,
+        massageShop: massageShopID,
       }),
     }
   );

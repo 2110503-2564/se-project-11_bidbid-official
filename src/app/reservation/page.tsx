@@ -62,7 +62,7 @@ export default function Reservation() {
     console.log(session.user.id);
     if (bookDate === null) return;
     await addReservation(
-      session.user.id,
+      // session.user.id,
       bookDate.toISOString(),
       "10:00",
       duration,
