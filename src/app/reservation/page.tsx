@@ -55,22 +55,37 @@ export default function Reservation() {
 
     console.log("user reservation token: ", session?.accessToken); //debug user token
 
-    if (!massageShop || !bookDate) {
-      alert("Please select a massage shop and date.");
+    if (!massageShop) {
+      alert("Please select a massage shop.");
       return;
     }
+
+    if (!bookDate || !dayjs(bookDate).isValid()) {
+      alert("Please select a valid date.");
+      return;
+    }
+
+    const date = bookDate.toISOString();
+    console.log("Date to be sent:", date);
+
     console.log(session.user.id);
-    if (bookDate === null) return;
-    await addReservation(
-      // session.user.id,
-      bookDate.toISOString(),
-      "10:00",
-      duration,
-      therapist,
-      massageShop,
-      massageProgram,
-      session.accessToken
-    );
+
+    try{
+      await addReservation(
+        date,
+        "10:00",
+        duration,
+        therapist,
+        massageShop,
+        massageProgram,
+        session.accessToken
+      );
+      alert("Reservation successful!");
+      router.push("/");
+    }catch (error) {
+      console.error("Reservation failed:", error);
+      alert("Reservation failed. Please try again.");
+    }
   };
 
 

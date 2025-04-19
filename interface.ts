@@ -36,7 +36,11 @@ export interface MassageJson {
 
 export interface ReservationItem {
   _id: string;
-  reservationDate: string;
+  date: string;
+  time: string;
+  duration: number;
+  massageProgram: string;
+
   massageShop: {
     _id: string;
     name: string;
@@ -47,15 +51,49 @@ export interface ReservationItem {
     id: string;
     picture: string;
   };
-  // user: string
+
   user: {
     _id: string;
     name: string;
     phoneNumber: string;
     email?: string;
   };
+
+  therapist: {
+    _id: string;
+    user: {
+      _id: string;
+      name: string;
+    };
+  };
+
   createdAt: string;
 }
+
+// export interface ReservationItem {
+//   _id: string;
+//   reservationDate: string;
+//   massageShop: {
+//     _id: string;
+//     name: string;
+//     address: string;
+//     phoneNumber: string;
+//     openTime: string;
+//     closeTime: string;
+//     id: string;
+//     picture: string;
+//   };
+//   // user: string
+//   user: {
+//     _id: string;
+//     name: string;
+//     phoneNumber: string;
+//     email?: string;
+//   };
+//   createdAt: string;
+// }
+
+
 // ------------------------------
 export interface TherapistJson {
   success: boolean;

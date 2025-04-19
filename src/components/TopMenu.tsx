@@ -54,7 +54,7 @@ export default function TopMenu() {
             pageRef='/myreview' />
             <TopMenuItem 
             // title='All Review' 
-            title={'View Profile'}
+            title={'View Therapist'}
             pageRef='/profile' />
         </div>
       </div>
