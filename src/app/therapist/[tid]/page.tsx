@@ -114,6 +114,9 @@ export default function UpdateTherapistPage() {
   
     try {
       const updatePayload: any = {
+        name,
+        phoneNumber,
+        email,
         gender,
         age,
         experience,
@@ -136,6 +139,8 @@ export default function UpdateTherapistPage() {
         session.accessToken
       );
   
+      console.log("call update");
+
       alert('Therapist profile updated successfully');
   
       if (isAdmin) {

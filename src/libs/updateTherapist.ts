@@ -10,11 +10,14 @@ const updateTherapist = async (id: string, body: any, token: string) => {
       body: JSON.stringify(body),
     });
   
+    console.log('Response:', res.status);
+
     if (!res.ok) {
       throw new Error('Failed to update therapist');
     }
   
     return await res.json();
+
   };
   
   export default updateTherapist;
