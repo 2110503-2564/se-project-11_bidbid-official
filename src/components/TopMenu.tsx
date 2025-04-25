@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 export default function TopMenu() {
   const { data: session, status } = useSession();
   const role = session?.user?.role;
-
+  const therapistId = session?.user?.id
   return (
     <div className='fixed top-0 left-0 right-0 z-30 h-[50px] flex flex-row bg-white
          border-b border-gray-300 items-center px-4 '>
@@ -32,6 +32,9 @@ export default function TopMenu() {
           {/* Role-specific buttons */}
           {session && role === 'therapist' && (
             <TopMenuItem title='My Profile' pageRef='/therapist/profile' />
+          )}
+          {session && role === 'therapist' && (
+            <TopMenuItem title='My Schedule'pageRef={`/therapist/${therapistId}/schedule`} />
           )}
 
           {session && (role === 'user' || role === 'admin') && (
