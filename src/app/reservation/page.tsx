@@ -27,6 +27,7 @@ export default function Reservation() {
   const [massageProgram, setMassageProgram] = useState<string>("");
   const [duration, setDuration] = useState<number>(0.5);
   const [bookDate, setBookDate] = useState<Dayjs | null>(null);
+  const [time, setTime] = useState<string>("08:00");
 
   const [massageShops, setMassageShops] = useState<MassageItem[]>([]);
   useEffect(() => {
@@ -73,7 +74,7 @@ export default function Reservation() {
     try{
       await addReservation(
         date,
-        "10:00",
+        time,
         duration,
         therapist,
         massageShop,
@@ -187,9 +188,11 @@ export default function Reservation() {
           <div className="w-full max-w-[300px]">
             <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
             <div className="h-[40px]">
-              <CustomTimePicker />
+              <CustomTimePicker 
+              onTimeChange={(newTime) => setTime(newTime)}
+              />
             </div>
-</div>
+          </div>
 
         </div>
   

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function CustomTimePicker() {
+export default function CustomTimePicker({onTimeChange} : {onTimeChange: (time: string) => void}) {
   const [hour, setHour] = useState(8);
   const [minute, setMinute] = useState(0);
 
@@ -17,9 +17,13 @@ export default function CustomTimePicker() {
     setMinute(parseInt(e.target.value));
   };
 
-  const formattedTime = `${hour.toString().padStart(2, "0")}:${minute
-    .toString()
-    .padStart(2, "0")}`;
+  useEffect(() => {
+    const formattedTime = `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
+
+    onTimeChange(formattedTime);
+  } , [hour, minute, onTimeChange] );
 
   return (
     <div className="bg-white w-full max-w-[300px] h-[40px] rounded flex items-center gap-2">
