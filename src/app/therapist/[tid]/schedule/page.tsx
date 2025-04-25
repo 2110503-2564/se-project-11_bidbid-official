@@ -1,11 +1,9 @@
-// src/app/therapist/[tid]/schedule/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import getReservations from '@/libs/getReservations';
 import dayjs from 'dayjs';
+import getTherapistReservations from '@/libs/getTherapistReservations';
 
 interface ScheduleItem {
   _id: string;
@@ -13,78 +11,104 @@ interface ScheduleItem {
   massageShopName: string;
   massageProgram: string;
   duration: number;
-  date: string;  // YYYY-MM-DD or DD/MM/YYYY
-  time: string;  // HH:mm
+  date: string; // "DD/MM/YYYY"
+  time: string; // "HH:mm"
 }
 
-export default function TherapistSchedulePage() {
-  const router = useRouter();
-  const { data: session } = useSession();
+export default function MySchedulePage() {
+  const { data: session, status } = useSession();
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!session?.accessToken) return;
+    if (status !== 'authenticated' || !session.accessToken) return;
 
-    // Fetch all reservations; backend will filter by therapist role
-    getReservations(session.accessToken)
-      .then((data: any[]) => {
-        const formatted = data.map((r: any) => ({
+    getTherapistReservations(session.accessToken)
+      .then((data) => {
+        // map API → UI shape
+        const formatted = data.map((r) => ({
           _id: r._id,
-          userName: r.user?.name || r.userName || 'Unknown',
+          userName: r.user.name,
           massageShopName: r.massageShop.name,
           massageProgram: r.massageProgram,
           duration: r.duration,
-          date: dayjs(r.date || r.reservationDate).format('DD/MM/YYYY'),
-          time: dayjs(r.time || r.reservationDate).format('HH:mm'),
+          date: dayjs(r.date).format('DD/MM/YYYY'),
+          time: r.time,
         }));
+
+        // manual numeric sort: first by date (Y/M/D), then by time (H:m)
+        formatted.sort((a, b) => {
+          // parse dates
+          const [d1, m1, y1] = a.date.split('/').map(Number);
+          const [d2, m2, y2] = b.date.split('/').map(Number);
+          if (y1 !== y2) return y1 - y2;
+          if (m1 !== m2) return m1 - m2;
+          if (d1 !== d2) return d1 - d2;
+          // same date → parse times
+          const [h1, min1] = a.time.split(':').map(Number);
+          const [h2, min2] = b.time.split(':').map(Number);
+          if (h1 !== h2) return h1 - h2;
+          return min1 - min2;
+        });
+
         setSchedule(formatted);
       })
-      .catch((err: any) => setError(err.message));
-  }, [session]);
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
+  }, [session, status]);
 
-  // Group by date
-  const grouped: Record<string, ScheduleItem[]> = {};
-  schedule.forEach((item) => {
-    if (!grouped[item.date]) grouped[item.date] = [];
-    grouped[item.date].push(item);
-  });
+  if (status === 'loading') return <p>Loading schedule…</p>;
+  if (error) return <p className="text-red-600">Error: {error}</p>;
+
+  // group by formatted date; object keys preserve insertion order
+  const byDate = schedule.reduce<Record<string, ScheduleItem[]>>((acc, item) => {
+    (acc[item.date] ||= []).push(item);
+    return acc;
+  }, {});
 
   return (
-    <div className="px-8 py-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">My Schedule</h1>
-        <button
-          onClick={() => router.push(`/therapist/${session?.user.id}`)}
-          className="text-blue-600 hover:underline"
-        >
-          My Profile
-        </button>
-      </header>
+    <div className="p-6">
+      <h1 className="text-2xl mb-4">My Schedule</h1>
 
-      {error && <p className="mt-4 text-red-500">{error}</p>}
+      {Object.entries(byDate).map(([date, items]) => (
+        <section key={date} className="mb-8">
+          <h2 className="flex items-center text-lg font-semibold mb-2">
+            <span className="inline-block bg-black text-white rounded-full w-4 h-4 mr-2" />
+            {date}
+          </h2>
+          <div className="space-y-4">
+            {items.map((i) => (
+              <div
+                key={i._id}
+                className="border rounded-lg p-4 shadow-sm bg-white"
+              >
+                <p>
+                  <strong>Name:</strong> {i.userName}
+                </p>
+                <p>
+                  <strong>Massage Shop:</strong> {i.massageShopName}
+                </p>
+                <p>
+                  <strong>Program:</strong> {i.massageProgram}
+                </p>
+                <p>
+                  <strong>Duration (hour):</strong> {i.duration}
+                </p>
+                <p>
+                  <strong>Date:</strong> {i.date}
+                </p>
+                <p>
+                  <strong>Time:</strong> {i.time}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
 
-      <div className="mt-6 space-y-8">
-        {Object.entries(grouped).map(([date, items]) => (
-          <section key={date}>
-            <div className="flex items-center text-lg font-semibold">
-              <span className="mr-2">&#9679;</span> {date}
-            </div>
-            <div className="mt-4 space-y-4">
-              {items.map((item) => (
-                <div key={item._id} className="bg-white rounded-xl p-4 shadow-md">
-                  <p><strong>Name:</strong> {item.userName}</p>
-                  <p><strong>Massage Shop:</strong> {item.massageShopName}</p>
-                  <p><strong>Massage Program:</strong> {item.massageProgram}</p>
-                  <p><strong>Duration (hour):</strong> {item.duration}</p>
-                  <p><strong>Date:</strong> {item.date}</p>
-                  <p><strong>Time:</strong> {item.time}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
+      {schedule.length === 0 && <p>No appointments found.</p>}
     </div>
   );
 }
