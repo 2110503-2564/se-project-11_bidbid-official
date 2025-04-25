@@ -69,12 +69,12 @@ export default function MySchedulePage() {
   }, {});
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl mb-4">My Schedule</h1>
+    <div className="p-10 px-60 bg-gray-100">
+      <h1 className="text-3xl font-bold mb-4">My Schedule</h1>
 
       {Object.entries(byDate).map(([date, items]) => (
         <section key={date} className="mb-8">
-          <h2 className="flex items-center text-lg font-semibold mb-2">
+          <h2 className="flex items-center text-xl font-semibold mb-2">
             <span className="inline-block bg-black text-white rounded-full w-4 h-4 mr-2" />
             {date}
           </h2>
@@ -82,7 +82,7 @@ export default function MySchedulePage() {
             {items.map((i) => (
               <div
                 key={i._id}
-                className="border rounded-lg p-4 shadow-sm bg-white"
+                className="border rounded-lg p-6 leading-7 shadow-sm bg-white"
               >
                 <p>
                   <strong>Name:</strong> {i.userName}
