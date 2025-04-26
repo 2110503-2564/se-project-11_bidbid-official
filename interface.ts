@@ -42,13 +42,13 @@ export interface ReservationJson {
 
 export interface ReservationItem {
   _id: string;
-  massageShop: MassageItem[];
-  user: UserItem[];
+  massageShop: MassageItem;
+  user: UserItem;
   date: string;
   time: string;
   duration: number;
   massageProgram: string;
-  therapist: string;
+  therapist: TherapistItem;
   createdAt: string;
   __v: number;
 }
@@ -84,7 +84,7 @@ export interface TherapistJson {
 
 export interface TherapistItem {
   _id: string;
-  user: UserItem[];
+  user: UserItem;
   gender: string;
   age: number;
   experience: number;
