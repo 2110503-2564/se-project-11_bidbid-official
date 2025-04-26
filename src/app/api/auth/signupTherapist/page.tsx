@@ -15,7 +15,7 @@ export default function TherapistSignUpPage() {
   const [massageShops, setMassageShops] = useState<MassageShop[]>([])
   const [formData, setFormData] = useState({
     name: '',
-    gender: '',
+    gender: 'Select Gender',
     age : '',
     phoneNumber: '',
     email: '',
@@ -91,7 +91,7 @@ export default function TherapistSignUpPage() {
       // clear form data
       setFormData({
         name: '',
-        gender: 'Female',
+        gender: 'Select Gender',
         age: '',
         phoneNumber: '',
         email: '',
@@ -147,10 +147,9 @@ export default function TherapistSignUpPage() {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              required
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
             >
-              <option value="" disabled>Select your gender</option>
+              <option value="Select Gender">Select Gender</option>
               <option value="Female">Female</option>
               <option value="Male">Male</option>
             </select>
@@ -265,8 +264,7 @@ export default function TherapistSignUpPage() {
                   }))
                 }}
                 required
-                // className="border px-2 py-1 rounded w-full"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                className="border px-2 py-1 rounded w-full"
               >
                 {/* ✅ option นี้ใช้เป็น placeholder และเลือกไม่ได้ */}
                 <option value="" disabled hidden>
