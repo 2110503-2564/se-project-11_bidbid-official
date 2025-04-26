@@ -15,7 +15,7 @@ export default function TherapistSignUpPage() {
   const [massageShops, setMassageShops] = useState<MassageShop[]>([])
   const [formData, setFormData] = useState({
     name: '',
-    gender: 'Select Gender',
+    gender: '',
     age : '',
     phoneNumber: '',
     email: '',
@@ -63,6 +63,23 @@ export default function TherapistSignUpPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (
+      formData.name === '' ||
+      formData.gender === '' ||
+      formData.age === '' ||
+      formData.phoneNumber === '' ||
+      formData.email === '' ||
+      formData.password === '' ||
+      formData.experience === '' ||
+      formData.specialities === '' ||
+      formData.massageShopID === '' ||
+      formData.licenseNumber === ''
+    )
+    {
+      alert('Please fill in all required fields.')
+      return
+    }
+    
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
       const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
@@ -91,7 +108,7 @@ export default function TherapistSignUpPage() {
       // clear form data
       setFormData({
         name: '',
-        gender: 'Select Gender',
+        gender: '',
         age: '',
         phoneNumber: '',
         email: '',
@@ -134,7 +151,7 @@ export default function TherapistSignUpPage() {
               type="text"
               value={formData.name}
               onChange={handleChange}
-              required
+              // required
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -166,7 +183,7 @@ export default function TherapistSignUpPage() {
               onChange={handleChange}
               pattern="[0-9]{10}"
               maxLength={10}
-              required
+              // required
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
               placeholder="XXXXXXXXXX"
             />
@@ -183,7 +200,7 @@ export default function TherapistSignUpPage() {
                 step="1"
                 value={formData.age}
                 onChange={handleChange}
-                required
+                // required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md"
               />
           </div>
@@ -197,7 +214,7 @@ export default function TherapistSignUpPage() {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              required
+              // required
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
               placeholder="example@gmail.com"
             />
@@ -212,7 +229,7 @@ export default function TherapistSignUpPage() {
               type="password"
               value={formData.password}
               onChange={handleChange}
-              required
+              // required
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -228,7 +245,7 @@ export default function TherapistSignUpPage() {
               step="1"
               value={formData.experience}
               onChange={handleChange}
-              required
+              // required
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
               placeholder="answer in year at least 0"
             />
@@ -263,7 +280,7 @@ export default function TherapistSignUpPage() {
                     massageShop_name: selectedShop?.name || ''
                   }))
                 }}
-                required
+                // required
                 className="border px-2 py-1 rounded w-full"
               >
                 {/* ✅ option นี้ใช้เป็น placeholder และเลือกไม่ได้ */}
@@ -289,6 +306,7 @@ export default function TherapistSignUpPage() {
               type="text"
               value={formData.licenseNumber}
               onChange={handleChange}
+              // required
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
