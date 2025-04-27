@@ -6,7 +6,7 @@ export default async function getMassageShops() {
   // const response = await fetch("https://backend-may-i-scan.vercel.app/api/v1/massageShops")
   const response = await fetch(`${baseUrl}/api/v1/massageShops`);
   if (!response.ok) {
-    throw new Error("Failed to fetch venues");
+    throw new Error("Failed to fetch massge shops");
   }
 
   return await response.json();
