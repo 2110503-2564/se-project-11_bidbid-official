@@ -66,6 +66,9 @@ export default function TherapistListPage() {
 
   const handleRemove = async (id: string) => {
     if (!session?.accessToken) return;
+
+    const confirmed = window.confirm("Are you sure you want to delete this therapist?");
+    if(!confirmed) return;
   
     try {
       await removeTherapist(id, session.accessToken);
@@ -133,7 +136,7 @@ export default function TherapistListPage() {
 
         <button className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
           onClick={() => {
-            const confirmed = window.confirm("Are you sure you want to delete this therapist?");
+            // const confirmed = window.confirm("Are you sure you want to delete this therapist?");
             handleRemove(therapist._id);
           }}>
           Delete Profile
