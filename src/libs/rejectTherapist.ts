@@ -1,4 +1,4 @@
-export default async function rejectTherapist(id: string, token: string) {
+export default async function rejectTherapist(id: string, comment: string, token: string) {
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   
     const res = await fetch(`${baseUrl}/api/v1/therapists/reject/${id}`, {
@@ -7,6 +7,7 @@ export default async function rejectTherapist(id: string, token: string) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ comment })
     });
   
     if (!res.ok) {

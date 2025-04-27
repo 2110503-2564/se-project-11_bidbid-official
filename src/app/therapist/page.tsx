@@ -68,24 +68,33 @@ export default function TherapistListPage() {
 
   const handleReject = async (id: string) => {
     if (!session?.accessToken) return;
+  
+    const comment = window.prompt("Please provide a reason for rejection:");
+    if(!comment) return;
 
+    const therapist = pendingTherapists.find((t) => t._id === id);
+  
+    if (!therapist) {
+      alert("Therapist not found!");
+      return;
+    }
+  
     try {
-      await rejectTherapist(id, session.accessToken);
-
+      await rejectTherapist(id, comment || "No reason provided", session.accessToken);
+  
       const updatedPending = pendingTherapists.filter((t) => t._id !== id);
-      const rejectedTherapist = pendingTherapists.find((t) => t._id === id);
-
-      if (rejectedTherapist) {
-        setRejectedTherapists([...rejectedTherapists, rejectedTherapist]);
-      }
-
       setPendingTherapists(updatedPending);
+  
+      const rejected = await getRejectedTherapists();
+      setRejectedTherapists(rejected.therapists);
+  
       alert("Therapist rejected successfully.");
     } catch (error) {
       console.error("Rejection failed:", error);
       alert("Failed to reject therapist.");
     }
   };
+  
 
   const handleRemove = async (id: string) => {
     if (!session?.accessToken) return;
@@ -146,7 +155,7 @@ export default function TherapistListPage() {
   
       {/* Show the comment if the state is 'rejected' */}
       {therapist.state === 'rejected' && therapist.comment && (
-        <p><strong>Comment:</strong> {therapist.comment}</p>
+        <p className="text-red-600"><strong>Comment:</strong> {therapist.comment}</p>
       )}
   
       <div className="flex flex-wrap gap-2 mt-4">
