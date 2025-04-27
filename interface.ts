@@ -93,6 +93,7 @@ export interface TherapistItem {
   licenseNumber: string;
   workingInfo: WorkingInfoItem[];
   notAvailableDays: [string];
+  comment: string;
   createdAt: string;
   __v: string;
 }

@@ -18,6 +18,7 @@ type Therapist = {
     massageShop_name: string
   }[]
   notAvailableDays: string[]
+  comment: string
 }
 
 type User = {
@@ -97,13 +98,16 @@ export default function TherapistProfilePage() {
                 ? therapist.notAvailableDays.join(', ')
                 : '-'}
           </p>
-
+          
+          {/* Show Comment only if state is 'rejected' */}
+          {therapist.state === 'rejected' && (
+            <p><strong>Comment:</strong> {therapist.comment || 'No comment provided'}</p>
+          )}
         </div>
 
         {/* Button */}
         <div className="mt-6">
           <button
-            // onClick={() => router.push(`/therapist/${session?.user?.id}`)}
             onClick={() => router.push(`/therapist/${therapist._id}`)}
             className="bg-blue-800 text-white px-3 py-1 rounded 
                 border border-transparent
