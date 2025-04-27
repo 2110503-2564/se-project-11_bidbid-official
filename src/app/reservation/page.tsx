@@ -151,7 +151,7 @@ export default function Reservation() {
               variant="outlined"
               type="number"
               size="small"
-              inputProps={{ step: 0.5, min: 0.5 }}
+              inputProps={{ step: 0.5, min: 0.5, max: 3 }}
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}
             />

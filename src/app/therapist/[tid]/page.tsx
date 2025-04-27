@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import getTherapist from '@/libs/getTherapist'
 import getMe from '@/libs/getMe'
+import getMassageShops from '@/libs/getMassageShops'
 import updateTherapist from '@/libs/updateTherapist'
 
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -23,20 +24,34 @@ export default function UpdateTherapistPage() {
   const [experience, setExperience] = useState<number>(0)
   const [specialities, setSpecialities] = useState('')
   const [licenseNumber, setLicenseNumber] = useState('')
-  const [massageShop, setMassageShop] = useState('Serenity Spa')
+  const [massageShop, setMassageShop] = useState('')
   const [notAvailableDays, setNotAvailableDays] = useState<string[]>([])
   const [status, setStatus] = useState('')
+  const [shops, setShops] = useState<any[]>([])
 
   const [previousData, setPreviousData] = useState({
     name: '',
     phoneNumber: '',
     email: '',
+    massageShop: '',
   })
 
   const role = session?.user?.role;
   const isAdmin = role === 'admin';
 
   useEffect(() => {
+    const fetchMassageShops = async () => {
+      try{
+        const response = await getMassageShops();
+        const shops = Array.isArray(response.data) ? response.data : []
+        setShops(shops)
+      }
+      catch (error) {
+        console.error('Error fetching massage shops:', error)
+        alert('Failed to fetch massage shops')
+      }
+    }
+
     const fetchTherapist = async () => {
       if (!session?.accessToken || !tid) return
 
@@ -54,11 +69,13 @@ export default function UpdateTherapistPage() {
         setLicenseNumber(data.licenseNumber)
         setNotAvailableDays(data.notAvailableDays || [])
         setStatus(data.state || '')
+        setMassageShop(data.workingInfo?.[0]?.massageShopID || '')
 
         setPreviousData({
           name: data.user?.name || '',
           phoneNumber: data.user?.phoneNumber || '',
           email: data.user?.email || '',
+          massageShop: '',
         })
       } catch (err) {
         console.error('Error fetching therapist:', err)
@@ -68,6 +85,7 @@ export default function UpdateTherapistPage() {
     }
 
     fetchTherapist()
+    fetchMassageShops()
   }, [tid, session])
 
   const handleCheckboxChange = (day: string) => {
@@ -75,39 +93,6 @@ export default function UpdateTherapistPage() {
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     )
   }
-
-  // const handleUpdate = async () => {
-  //   if (!session?.accessToken) return
-
-  //   try {
-  //     const newStatus = !isAdmin && status === 'rejected' ? 'pending' : status;
-
-  //     await updateTherapist(
-  //       tid as string,
-  //       {
-  //         gender,
-  //         age,
-  //         experience,
-  //         specialities,
-  //         licenseNumber,
-  //         notAvailableDays,
-  //         state: newStatus, // include status in the update
-  //       },
-  //       session.accessToken
-  //     )
-
-  //     alert('Therapist profile updated successfully')
-  //     // router.push(`/therapist/profile`)
-  //     if (isAdmin) {
-  //       router.push('/therapist');
-  //     } else {
-  //       router.push('/therapist/profile');
-  //     }
-  //   } catch (err) {
-  //     console.error('Update error:', err)
-  //     alert('Failed to update therapist profile')
-  //   }
-  // }
 
   const handleUpdate = async () => {
     if (!session?.accessToken) return;
@@ -123,6 +108,10 @@ export default function UpdateTherapistPage() {
         specialities,
         licenseNumber,
         notAvailableDays,
+        workingInfo: {
+          massageShopID: massageShop, 
+          massageShop_name: shops.find((shop) => shop._id === massageShop)?.name || previousData.massageShop,
+        },        
       };
   
       if (!isAdmin && status === 'rejected') {
@@ -182,11 +171,18 @@ export default function UpdateTherapistPage() {
           </div>
           <div>
             <label>Age</label>
-            <input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="w-full border px-3 py-2 rounded" />
+            <input type="number" 
+            value={age} onChange={(e) => setAge(e.target.value)} 
+            min="18"
+            className="w-full border px-3 py-2 rounded" />
           </div>
           <div>
             <label>Phone Number</label>
-            <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder={previousData.phoneNumber} className="w-full border px-3 py-2 rounded" />
+            <input value={phoneNumber} 
+              onChange={(e) => setPhoneNumber(e.target.value)} 
+              placeholder={previousData.phoneNumber} 
+              maxLength={10}
+              className="w-full border px-3 py-2 rounded" />
           </div>
           <div>
             <label>Gender</label>
@@ -211,29 +207,23 @@ export default function UpdateTherapistPage() {
             <label>Specialities</label>
             <input value={specialities} onChange={(e) => setSpecialities(e.target.value)} className="w-full border px-3 py-2 rounded" />
           </div>
-          {/* <div>
-            <label className={isEditable ? '' : 'text-gray-400'}>MassageShop</label>
-            <select
-              value={massageShop}
-              onChange={(e) => setMassageShop(e.target.value)}
-              disabled={!isEditable}
-              className={`w-full border px-3 py-2 rounded ${!isEditable ? 'bg-gray-200' : ''}`}
-            >
-              <option value="Serenity Spa">Serenity Spa</option>
-              <option value="Another Spa">Another Spa</option>
-            </select>
-          </div> */}
 
           <div>
-            <label className={canEditRestrictedFields ? '' : 'text-gray-400'}>MassageShop</label>
+            <label className={canEditRestrictedFields ? '' : 'text-gray-400'}>
+              MassageShop
+              </label>
             <select
               value={massageShop}
               onChange={(e) => setMassageShop(e.target.value)}
               disabled={!canEditRestrictedFields}
               className={`w-full border px-3 py-2 rounded ${!canEditRestrictedFields ? 'bg-gray-200' : ''}`}
             >
-              <option value="Serenity Spa">Serenity Spa</option>
-              <option value="Another Spa">Another Spa</option>
+              
+              {shops.map((shop) => (
+                  <option key={shop._id} value={shop._id}>
+                    {shop.name}
+                  </option>
+                ))}
             </select>
           </div>
 
