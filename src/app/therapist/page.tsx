@@ -143,7 +143,12 @@ export default function TherapistListPage() {
         <strong>Unavailable Days:</strong>{" "}
         {therapist.notAvailableDays?.join(", ")}
       </p>
-
+  
+      {/* Show the comment if the state is 'rejected' */}
+      {therapist.state === 'rejected' && therapist.comment && (
+        <p><strong>Comment:</strong> {therapist.comment}</p>
+      )}
+  
       <div className="flex flex-wrap gap-2 mt-4">
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -151,7 +156,7 @@ export default function TherapistListPage() {
         >
           Update Profile
         </button>
-
+  
         {showVerifyButton && (
           <>
             <button
@@ -160,15 +165,9 @@ export default function TherapistListPage() {
             >
               Verify
             </button>
-            <button
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-              onClick={() => handleReject(therapist._id)}
-            >
-              Reject
-            </button>
           </>
         )}
-
+  
         {showRejectButton && (
           <button
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
@@ -177,7 +176,7 @@ export default function TherapistListPage() {
             Reject
           </button>
         )}
-
+  
         <button
           className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
           onClick={() => handleRemove(therapist._id)}
@@ -187,6 +186,7 @@ export default function TherapistListPage() {
       </div>
     </div>
   );
+  
 
   return (
     <div className="min-h-screen bg-gray-100 p-10 px-40">
