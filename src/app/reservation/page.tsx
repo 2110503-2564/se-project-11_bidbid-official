@@ -41,7 +41,7 @@ export default function Reservation() {
   const [Therapists, setTherapists] = useState<TherapistItem[]>([]);
   useEffect(() => {
     const fetchTherapists = async () => {
-      var data = await getVerifiedTherapists(session?.accessToken || "");
+      var data = await getVerifiedTherapists();
       setTherapists(data.therapists);
     };
     fetchTherapists();

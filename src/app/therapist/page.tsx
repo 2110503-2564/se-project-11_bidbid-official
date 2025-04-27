@@ -21,7 +21,7 @@ export default function TherapistListPage() {
     const fetchTherapists = async () => {
       try {
         const pending = await getPendingTherapists(session.accessToken);
-        const verified = await getVerifiedTherapists(session.accessToken);
+        const verified = await getVerifiedTherapists();
         
         setPendingTherapists(pending);
         setVerifiedTherapists(verified.therapists);
