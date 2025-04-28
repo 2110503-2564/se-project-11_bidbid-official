@@ -48,6 +48,8 @@ export default function TherapistListPage() {
 
   const handleVerify = async (id: string) => {
     if (!session?.accessToken) return;
+    const confirmed = window.confirm("Are you sure you want to verify this therapist?")
+    if (!confirmed) return;
 
     try {
       await verifyTherapist(id, session.accessToken);
