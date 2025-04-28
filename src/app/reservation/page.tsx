@@ -196,7 +196,7 @@ export default function Reservation() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Duration (hour)
+              Duration (hour) maximum:3
             </label>
             <TextField
               fullWidth
