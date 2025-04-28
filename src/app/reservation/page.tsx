@@ -16,6 +16,11 @@ import CustomTimePicker from "@/components/CustomTimePicker";
 import addReservation from "@/libs/addReservation";
 import updateReservation from "@/libs/updateReservation";
 import getMe from "@/libs/getMe";
+import weekday from 'dayjs/plugin/weekday';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import 'dayjs/locale/en';
+dayjs.extend(weekday);
+dayjs.extend(localizedFormat);
 
 export default function Reservation() {
   const router = useRouter();
@@ -105,7 +110,7 @@ export default function Reservation() {
               value={massageShop}
               onChange={(e) => setMassageShop(e.target.value)}
             >
-              <option value="">Select a massage shop</option>
+              <option value=""disabled hidden>Select a massage shop</option>
               {massageShops.map((shop) => (
                 <option key={shop._id} value={shop._id}>{shop.name}</option>
               ))}
@@ -118,7 +123,7 @@ export default function Reservation() {
               value={therapist}
               onChange={(e) => setTherapist(e.target.value)}
             >
-              <option value="">Select therapist</option>
+              <option value=""disabled hidden>Select therapist</option>
               {Therapists.map((th) => (
                 <option key={th._id} value={th._id}>{th.user.name}</option> 
                 //{/* ไม่ต้องแก้นะ */}
@@ -139,7 +144,7 @@ export default function Reservation() {
               value={massageProgram}
               onChange={(e) => setMassageProgram(e.target.value)}
             >
-              <option value="">Select program</option>
+              <option value=""disabled hidden>Select program</option>
               <option value="footMassage">Foot Massage</option>
               <option value="oilMassage">Oil Massage</option>
             </select>
