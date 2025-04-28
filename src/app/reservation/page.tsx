@@ -40,6 +40,11 @@ export default function Reservation() {
     dayjs().hour(8).minute(0).second(0)
   );
 
+  const now = dayjs();
+  const todayStart = dayjs().startOf("day");
+  const closeToday = todayStart.hour(17).minute(0).second(0);
+  const afterCloseToday = now.isAfter(closeToday);
+
   const [massageShops, setMassageShops] = useState<MassageItem[]>([]);
   useEffect(() => {
     const fetchMassageShops = async () => {
@@ -61,21 +66,18 @@ export default function Reservation() {
   useEffect(() => {
     if (!bookDate) return;
 
-    const openTime = bookDate.hour(8).minute(0).second(0);
-    const closeTime = bookDate.hour(17).minute(0).second(0);
+    const open = bookDate.hour(8).minute(0).second(0);
+    const close = bookDate.hour(17).minute(0).second(0);
 
-    if (bookDate.isSame(dayjs(), "day")) {
-      let now = dayjs();
+    if (bookDate.isSame(todayStart, "day") && !afterCloseToday) {
       const rem = now.minute() % 30;
       const add = rem === 0 && now.second() === 0 ? 0 : 30 - rem;
       let rounded = now.add(add, "minute").startOf("minute");
-
-      if (rounded.isBefore(openTime)) rounded = openTime;
-      if (rounded.isAfter(closeTime)) rounded = closeTime;
-
+      if (rounded.isBefore(open)) rounded = open;
+      if (rounded.isAfter(close)) rounded = close;
       setMinTime(rounded);
     } else {
-      setMinTime(openTime);
+      setMinTime(open);
     }
   }, [bookDate]);
 
@@ -218,7 +220,10 @@ export default function Reservation() {
             </label>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                disablePast
+                shouldDisableDate={(date) =>
+                  date.isBefore(todayStart, "day") ||
+                  (afterCloseToday && date.isSame(todayStart, "day"))
+                }
                 value={bookDate}
                 onChange={(newValue) => setBookDate(newValue)}
                 slotProps={{
