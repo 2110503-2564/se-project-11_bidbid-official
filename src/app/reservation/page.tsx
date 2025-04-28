@@ -63,28 +63,15 @@ export default function Reservation() {
     fetchTherapists();
   }, []);
 
-  useEffect(() => {
-    if (!bookDate) return;
+  // Filter therapists based on the selected massage shop
+  const filteredTherapists = allTherapists.filter(
+    (therapist) => 
+      therapist.workingInfo.some(
+        (working) => working.massageShopID === massageShop
+      )
+  );
 
-    const open = bookDate.hour(8).minute(0).second(0);
-    const close = bookDate.hour(17).minute(0).second(0);
-
-    if (bookDate.isSame(todayStart, "day") && !afterCloseToday) {
-      const rem = now.minute() % 30;
-      const add = rem === 0 && now.second() === 0 ? 0 : 30 - rem;
-      let rounded = now.add(add, "minute").startOf("minute");
-      if (rounded.isBefore(open)) rounded = open;
-      if (rounded.isAfter(close)) rounded = close;
-      setMinTime(rounded);
-    } else {
-      setMinTime(open);
-    }
-  }, [bookDate]);
-
-  const maxTime = bookDate
-    ? bookDate.hour(17).minute(0).second(0)
-    : dayjs().hour(17).minute(0).second(0);
-
+  // Handle reservation form submission
   const handleReservation = async () => {
     if (!session?.accessToken) {
       alert("You must be logged in.");
@@ -249,34 +236,9 @@ export default function Reservation() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Time
             </label>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <TimePicker
-                value={
-                  bookDate && time
-                    ? dayjs(`${bookDate.format("YYYY-MM-DD")}T${time}`)
-                    : null
-                }
-                onChange={(newVal) => {
-                  if (newVal) setTime(newVal.format("HH:mm"));
-                }}
-                minutesStep={30}
-                ampm={false}
-                minTime={minTime}
-                maxTime={maxTime}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                    inputProps: { readOnly: true },
-                    sx: {
-                      height: 40,
-                      "& .MuiInputBase-root": { height: 40 },
-                      "& input": { padding: "10px 14px" },
-                    },
-                  },
-                }}
-              />
-            </LocalizationProvider>
+            <div className="h-[40px]">
+              <CustomTimePicker onTimeChange={(newTime) => setTime(newTime)} />
+            </div>
           </div>
         </div>
 
