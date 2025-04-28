@@ -1,158 +1,270 @@
+// src/app/myreservation/[rid]/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { DatePicker } from "@mui/x-date-pickers";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Select, MenuItem, Button } from "@mui/material";
-import dayjs, { Dayjs } from "dayjs";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import getMassageShops from "@/libs/getMassageShops";
+import dayjs, { Dayjs } from "dayjs";
+
+import {
+  Grid,
+  Paper,
+  Typography,
+  TextField,
+  MenuItem,
+  Button,
+  Box,
+} from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import getReservation from "@/libs/getReservation";
+import getMassageShops from "@/libs/getMassageShops";
+import getVerifiedTherapists from "@/libs/getVerifiedTherapist";
 import updateReservation from "@/libs/updateReservation";
+import { MassageItem, TherapistItem } from "../../../../interface";
 
 export default function UpdateReservationPage() {
-  const { rid } = useParams();
   const router = useRouter();
-  const { data: session } = useSession();
+  const params = useParams();
+  const rawRid = params.rid;
+  const rid = Array.isArray(rawRid) ? rawRid[0] : rawRid!;
 
-  const [massageShopId, setMassageShopId] = useState("");
-  const [reservationDate, setReservationDate] = useState<Dayjs | null>(null);
-  const [shops, setShops] = useState<any[]>([]);
-  const [previousShop, setPreviousShop] = useState("");
-  const [previousDate, setPreviousDate] = useState("");
+  // Pull both `data` and `status`
+  const { data: session, status } = useSession();
 
+  const [shops, setShops] = useState<MassageItem[]>([]);
+  const [therapists, setTherapists] = useState<TherapistItem[]>([]);
+
+  const [original, setOriginal] = useState({
+    date: "",
+    time: "",
+    duration: 0,
+    massageShop: "",
+    massageProgram: "",
+    therapist: "",
+  });
+
+  const [bookDate, setBookDate] = useState<Dayjs | null>(null);
+  const [time, setTime] = useState("08:00");
+  const [duration, setDuration] = useState(0.5);
+  const [shopId, setShopId] = useState("");
+  const [program, setProgram] = useState("");
+  const [therapistId, setTherapistId] = useState("");
+
+  // Fetch shops & therapists once
   useEffect(() => {
-    const fetchReservation = async () => {
+    getMassageShops().then((r) => setShops(r.data));
+    getVerifiedTherapists().then((r) => setTherapists(r.therapists));
+  }, []);
+
+  // Fetch the reservation **after** session is authenticated
+  useEffect(() => {
+    if (status !== "authenticated") return;
+
+    (async () => {
       try {
-        if (!rid || !session?.accessToken) return;
-
-        const { reservation, formattedDate, readableDate } =
-          await getReservation(rid as string, session.accessToken);
-
-        setPreviousShop(reservation.massageShop.name);
-        setPreviousDate(
-          dayjs(reservation.reservationDate).format("YYYY-MM-DD")
+        const { reservation, formattedDate } = await getReservation(
+          rid,
+          session.accessToken
         );
-        setMassageShopId(reservation.massageShop._id);
-        setReservationDate(dayjs(reservation.reservationDate));
-      } catch (err) {
-        console.error("Error fetching reservation:", err);
-      }
-    };
+        console.log("Fetched reservation:", reservation);
 
-    const fetchShops = async () => {
-      try {
-        const data = await getMassageShops();
-        setShops(data.data || []);
-      } catch (err) {
-        console.error("Error fetching shops:", err);
-      }
-    };
+        // Defensive checks in case your backend shape changed:
+        const d = dayjs(reservation.date);
+        setOriginal({
+          date: d.isValid() ? d.format("YYYY-MM-DD") : "",
+          time: reservation.time || "",
+          duration: reservation.duration || 0,
+          massageShop: reservation.massageShop?.name || "",
+          massageProgram: reservation.massageProgram || "",
+          therapist: reservation.therapist?.user?.name || "",
+        });
 
-    if (session?.accessToken) {
-      fetchReservation();
-      fetchShops();
-    }
-  }, [session, rid]);
+        setBookDate(d.isValid() ? d : null);
+        setTime(reservation.time || "08:00");
+        setDuration(reservation.duration ?? 0.5);
+        setShopId(reservation.massageShop?._id || "");
+        setProgram(reservation.massageProgram || "");
+        setTherapistId(reservation.therapist?._id || "");
+      } catch (err) {
+        console.error("Error loading reservation", err);
+      }
+    })();
+  }, [rid, status]);
+
+  const filteredTherapists = therapists.filter((t) =>
+    t.workingInfo.some((w) => w.massageShopID === shopId)
+  );
 
   const handleUpdate = async () => {
-    if (!reservationDate || !massageShopId || !session?.accessToken) return;
-
+    if (status !== "authenticated" || !bookDate) {
+      router.push("/api/auth/signin");
+      return;
+    }
+    const isoDate = `${bookDate.format("YYYY-MM-DD")}T${time}`;
     try {
-      await updateReservation(
-        String(rid),
-        reservationDate.toISOString(),
-        massageShopId,
-        session.accessToken
-      );
-      alert("Reservation updated successfully");
+      // updateReservation(id, reservationDate, massageShopId, token)
+      await updateReservation(rid, isoDate, shopId, session.accessToken);
+      alert("Reservation updated");
       router.push("/myreservation");
     } catch (err) {
-      console.error("Update error:", err);
-      alert("Failed to update reservation");
+      console.error("Update failed", err);
+      alert("Update failed");
     }
-
-    // try {
-    //   const res = await fetch(`http://massageshop-mayiscan-env.eba-ghuryipb.us-east-1.elasticbeanstalk.com/api/v1/reservations/${rid}`, {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       Authorization: `Bearer ${session.accessToken}`,
-    //     },
-    //     body: JSON.stringify({
-    //       reservationDate: reservationDate.toISOString(),
-    //       massageShop: massageShopId,
-    //     }),
-    //   })
-
-    //   if (!res.ok) {
-    //     throw new Error('Failed to update reservation')
-    //   }
-
-    //   alert('Reservation updated successfully')
-    //   router.push('/myreservation')
-    // } catch (err) {
-    //   console.error('Update error:', err)
-    //   alert('Failed to update reservation')
-    // }
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Update Reservation</h1>
+    <Box component="main" sx={{ py: 6, px: 2, bgcolor: "background.default" }}>
+      <Typography variant="h5" align="center" gutterBottom>
+        Update Reservation
+      </Typography>
 
-      <div className="mt-5 text-md text-gray-700">
-        <p>
-          Previous date: <span className="font-semibold">{previousDate}</span>
-        </p>
-      </div>
-
-      <div className="mb-5 mt-2 text-md text-gray-700">
-        <p>
-          Previous massage shop:{" "}
-          <span className="font-semibold">{previousShop}</span>
-        </p>
-      </div>
-
-      <div className="mb-5 mt-7">
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="New Reservation Date"
-            disablePast
-            value={reservationDate}
-            onChange={(value) => setReservationDate(value)}
-            className="bg-white w-full"
-          />
-        </LocalizationProvider>
-      </div>
-
-      <div className="mb-5">
-        <Select
-          value={massageShopId}
-          onChange={(e) => setMassageShopId(e.target.value)}
-          fullWidth
-          displayEmpty
-        >
-          <MenuItem value="" disabled>
-            Select New Massage Shop
-          </MenuItem>
-          {shops.map((shop) => (
-            <MenuItem key={shop._id} value={shop._id}>
-              {shop.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </div>
-
-      <button
-        onClick={handleUpdate}
-        className="bg-green-600 text-white px-4 py-2 rounded 
-        hover:bg-green-700 active:bg-green-700 active:scale-95"
+      <Box
+        sx={{
+          maxWidth: 960,
+          mx: "auto",
+          p: 3,
+          bgcolor: "background.paper",
+          borderRadius: 2,
+          boxShadow: 1,
+        }}
       >
-        Confirm Update
-      </button>
-    </div>
+        <Grid container spacing={4}>
+          {/* Left panel */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              variant="outlined"
+              sx={{ p: 2, bgcolor: "#f0f0f0", borderRadius: 1 }}
+            >
+              <Typography variant="subtitle1" gutterBottom>
+                Recent Information
+              </Typography>
+              <Typography>Date : {original.date || "-"}</Typography>
+              <Typography>Time : {original.time || "-"}</Typography>
+              <Typography>
+                Duration (hour) : {original.duration}
+              </Typography>
+              <Typography>
+                Massage shop : {original.massageShop || "-"}
+              </Typography>
+              <Typography>
+                Massage program : {original.massageProgram || "-"}
+              </Typography>
+              <Typography>
+                Therapist : {original.therapist || "-"}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Right form */}
+          <Grid item xs={12} md={8}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={4}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="New Reservation Date"
+                    value={bookDate}
+                    onChange={(d) => setBookDate(d)}
+                    slotProps={{
+                      textField: { fullWidth: true, size: "small" },
+                    }}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  label="Time"
+                  type="time"
+                  fullWidth
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  inputProps={{ step: 300 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  label="Duration (hour)"
+                  type="number"
+                  fullWidth
+                  value={duration}
+                  onChange={(e) => setDuration(+e.target.value)}
+                  inputProps={{ step: 0.5, min: 0.5, max: 3 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  select
+                  label="Massage Shop"
+                  fullWidth
+                  value={shopId}
+                  onChange={(e) => setShopId(e.target.value)}
+                >
+                  {shops.map((s) => (
+                    <MenuItem key={s._id} value={s._id}>
+                      {s.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  select
+                  label="Massage Program"
+                  fullWidth
+                  value={program}
+                  onChange={(e) => setProgram(e.target.value)}
+                >
+                  <MenuItem value="footMassage">Foot Massage</MenuItem>
+                  <MenuItem value="oilMassage">Oil Massage</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  select
+                  label="Therapist"
+                  fullWidth
+                  value={therapistId}
+                  onChange={(e) => setTherapistId(e.target.value)}
+                >
+                  {filteredTherapists.map((t) => (
+                    <MenuItem key={t._id} value={t._id}>
+                      {t.user.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                container
+                spacing={2}
+                justifyContent="flex-end"
+              >
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => router.back()}
+                  >
+                    Cancel Update
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleUpdate}
+                  >
+                    Confirm Update
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 }
