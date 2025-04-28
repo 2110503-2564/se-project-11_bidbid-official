@@ -71,8 +71,11 @@ export default function TherapistListPage() {
   const handleReject = async (id: string) => {
     if (!session?.accessToken) return;
   
-    const comment = window.prompt("Please provide a reason for rejection:");
-    if(!comment) return;
+    let comment = window.prompt("Please provide a reason for rejection:");
+
+    if (comment === null) return;
+    
+    if (comment.trim() === "") comment = "No reason provided";
 
     const therapist = pendingTherapists.find((t) => t._id === id);
   
@@ -82,7 +85,7 @@ export default function TherapistListPage() {
     }
   
     try {
-      await rejectTherapist(id, comment || "No reason provided", session.accessToken);
+      await rejectTherapist(id, comment, session.accessToken);
   
       const updatedPending = pendingTherapists.filter((t) => t._id !== id);
       setPendingTherapists(updatedPending);
@@ -111,9 +114,11 @@ export default function TherapistListPage() {
 
       const updatedPending = pendingTherapists.filter((t) => t._id !== id);
       const updatedVerified = verifiedTherapists.filter((t) => t._id !== id);
+      const updatedRejected = rejectedTherapists.filter((t) => t._id !== id);
 
       setPendingTherapists(updatedPending);
       setVerifiedTherapists(updatedVerified);
+      setRejectedTherapists(updatedRejected);
 
       alert("Therapist removed successfully.");
     } catch (error) {
