@@ -20,8 +20,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import getReservation from "@/libs/getReservation";
 import getMassageShops from "@/libs/getMassageShops";
-import getVerifiedTherapists from "@/libs/getVerifiedTherapist";
+import getAvailableTherapists from "@/libs/getAvailableTherapists";
 import updateReservation from "@/libs/updateReservation";
+import updateUnavailableTimeSlot from "@/libs/updateUnavailableTimeSlot";
+import addUnavailableTimeSlot from "@/libs/addUnavailableTimeSlot";
 import { MassageItem, TherapistItem } from "../../../../interface";
 
 export default function UpdateReservationPage() {
@@ -30,7 +32,6 @@ export default function UpdateReservationPage() {
   const rawRid = params.rid;
   const rid = Array.isArray(rawRid) ? rawRid[0] : rawRid!;
 
-  // Pull both `data` and `status`
   const { data: session, status } = useSession();
 
   const [shops, setShops] = useState<MassageItem[]>([]);
@@ -55,7 +56,6 @@ export default function UpdateReservationPage() {
   // Fetch shops & therapists once
   useEffect(() => {
     getMassageShops().then((r) => setShops(r.data));
-    getVerifiedTherapists().then((r) => setTherapists(r.therapists));
   }, []);
 
   // Fetch the reservation **after** session is authenticated
@@ -70,7 +70,6 @@ export default function UpdateReservationPage() {
         );
         console.log("Fetched reservation:", reservation);
 
-        // Defensive checks in case your backend shape changed:
         const d = dayjs(reservation.date);
         setOriginal({
           date: d.isValid() ? d.format("YYYY-MM-DD") : "",
@@ -93,24 +92,111 @@ export default function UpdateReservationPage() {
     })();
   }, [rid, status]);
 
-  const filteredTherapists = therapists.filter((t) =>
-    t.workingInfo.some((w) => w.massageShopID === shopId)
-  );
+  // Fetch available therapists dynamically
+  useEffect(() => {
+    const fetchTherapists = async () => {
+      if (!bookDate || !shopId || !time || !session?.accessToken) {
+        console.log("Missing required parameters");
+        return;
+      }
+
+      const day = dayjs(bookDate).format("dddd"); // Get the day of the week (e.g., "Monday")
+      const date = dayjs(bookDate).format("YYYY-MM-DD"); // Format date as YYYY-MM-DD
+      const startTime = time; // Start time
+      const endTime = dayjs(time, "HH:mm").add(duration, "hour").format("HH:mm"); // Calculate end time
+      console.log("date",bookDate);
+      try {
+        const data = await getAvailableTherapists(
+          date,
+          day,
+          startTime,
+          endTime,
+          shopId
+        );
+        console.log("Fetched therapists data:", data);
+        setTherapists(data.data);
+      } catch (error) {
+        console.error("Error fetching therapists:", error);
+      }
+    };
+
+    fetchTherapists();
+  }, [bookDate, shopId, time, duration]);
 
   const handleUpdate = async () => {
     if (status !== "authenticated" || !bookDate) {
       router.push("/api/auth/signin");
       return;
     }
+  
     const isoDate = `${bookDate.format("YYYY-MM-DD")}T${time}`;
+    const newDate = bookDate.format("YYYY-MM-DD");
+    const newDay = dayjs(bookDate).format("dddd");
+    const newStartTime = time;
+    const newEndTime = dayjs(time, "HH:mm").add(duration, "hour").format("HH:mm");
+  
     try {
-      // updateReservation(id, reservationDate, massageShopId, token)
-      await updateReservation(rid, isoDate, shopId, session.accessToken);
+      // Add the new unavailable time slot
+      console.log("Adding new unavailable time slot...");
+      await addUnavailableTimeSlot(
+        newDate,
+        newDay,
+        newStartTime,
+        newEndTime,
+        therapistId,
+        session.accessToken
+      );
+      console.log("New unavailable time slot added successfully.");
+  
+      // Update the reservation
+      console.log("Updating reservation...");
+      await updateReservation(rid,
+      isoDate,
+      newStartTime,
+      duration,
+      therapistId,
+      shopId,
+      session.accessToken);
+      console.log("Reservation updated successfully.");
+  
       alert("Reservation updated");
       router.push("/myreservation");
     } catch (err) {
       console.error("Update failed", err);
       alert("Update failed");
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!session?.accessToken) return;
+
+    console.log("Re-adding original time slot:", original);
+
+    try {
+      const { date, time, duration, therapist } = original;
+
+      if (!date || !time || !therapist) {
+        console.log("Missing required parameters to re-add time slot");
+        router.back();
+        return;
+      }
+
+      const endTime = dayjs(time, "HH:mm").add(duration, "hour").format("HH:mm");
+
+      await addUnavailableTimeSlot(
+        date,
+        dayjs(date).format("dddd"), // Get the day of the week
+        time,
+        endTime,
+        therapist,
+        session.accessToken
+      );
+
+      console.log("Original time slot re-added successfully.");
+      router.back();
+    } catch (err) {
+      console.error("Error re-adding original time slot:", err);
+      alert("Failed to re-add the original time slot. Please try again.");
     }
   };
 
@@ -228,11 +314,17 @@ export default function UpdateReservationPage() {
                   value={therapistId}
                   onChange={(e) => setTherapistId(e.target.value)}
                 >
-                  {filteredTherapists.map((t) => (
-                    <MenuItem key={t._id} value={t._id}>
-                      {t.user.name}
+                  {therapists.length > 0 ? (
+                    therapists.map((t) => (
+                      <MenuItem key={t._id} value={t._id}>
+                        {t.user.name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled value="">
+                      Therapist not available
                     </MenuItem>
-                  ))}
+                  )}
                 </TextField>
               </Grid>
               <Grid
@@ -246,7 +338,7 @@ export default function UpdateReservationPage() {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => router.back()}
+                    onClick={handleCancel} // Call the cancel handler
                   >
                     Cancel Update
                   </Button>

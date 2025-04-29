@@ -6,6 +6,8 @@ import { ReservationItem } from '../../interface'
 import { useRouter } from 'next/navigation'
 import getReservations from '@/libs/getReservations'
 import removeReservation from '@/libs/removeReservation'
+import deleteUnavailableTimeSlot from '@/libs/deleteUnavailableTimeSlot'
+import dayjs from "dayjs";
 
 export default function ReservationList() {
   const { data: session } = useSession()
@@ -26,22 +28,64 @@ export default function ReservationList() {
     }
   }
 
-  const handleRemove = async (id: string) => {
-    if (!session?.accessToken) return
-
+  const handleRemove = async (
+    id: string,
+    timeSlotDetails: { date: string; startTime: string; endTime: string; therapistId: string }
+  ) => {
+    if (!session?.accessToken) return;
+  
+    console.log("Removing reservation with the following details:", {
+      reservationId: id,
+      timeSlotDetails,
+    });
+  
     try {
-      await removeReservation(id, session.accessToken)
-      setReservations(prev => prev.filter(item => item._id !== id))
-      alert('Reservation removed successfully')
+      // Remove the reservation
+      console.log("Removing reservation...");
+      await removeReservation(id, session.accessToken);
+      console.log("Reservation removed successfully.");
+      
+      // Remove the associated unavailable time slot
+      const { date, startTime, endTime, therapistId } = timeSlotDetails;
+      console.log("Deleting unavailable time slot...");
+      await deleteUnavailableTimeSlot(therapistId, session.accessToken, date, startTime, endTime);
+      console.log("Unavailable time slot deleted successfully.");
+  
+      // Update the reservations state
+      setReservations((prev) => prev.filter((item) => item._id !== id));
+  
+      alert("Reservation removed successfully");
     } catch (err) {
-      console.error('Delete error:', err)
-      alert('Failed to remove reservation')
+      console.error("Error during removal process:", err);
+      alert("Failed to remove reservation or associated time slot");
     }
-  }
+  };
 
-  const handleUpdate = (id: string) => {
-    router.push(`/myreservation/${id}`)
-  }
+  const handleUpdate = async (
+    id: string,
+    timeSlotDetails: { date: string; startTime: string; endTime: string; therapistId: string }
+  ) => {
+    if (!session?.accessToken) return;
+  
+    console.log("Updating reservation with the following details:", {
+      reservationId: id,
+      timeSlotDetails,
+    });
+  
+    try {
+      // Delete the associated unavailable time slot
+      const { date, startTime, endTime, therapistId } = timeSlotDetails;
+      console.log("Deleting unavailable time slot before update...");
+      await deleteUnavailableTimeSlot(therapistId, session.accessToken, date, startTime, endTime);
+      console.log("Unavailable time slot deleted successfully.");
+  
+      // Navigate to the update reservation page
+      router.push(`/myreservation/${id}`);
+    } catch (err) {
+      console.error("Error during update process:", err);
+      alert("Failed to prepare for reservation update");
+    }
+  };
 
   useEffect(() => {
     if (!session?.accessToken) return
@@ -70,14 +114,28 @@ export default function ReservationList() {
         <div>Therapist: {item.therapist?.user?.name || "N/A"}</div>
 
         <div className="flex gap-2 pt-2">
+        <button
+          onClick={() =>
+            handleUpdate(item._id, {
+              date: dayjs(item.date).format("YYYY-MM-DD"),
+              startTime: item.time,
+              endTime: calculateEndTime(item.time, item.duration),
+              therapistId: item.therapist?._id,
+            })
+          }
+          className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 active:scale-95"
+        >
+          Update Reservation
+        </button>
           <button
-            onClick={() => handleUpdate(item._id)}
-            className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 active:scale-95"
-          >
-            Update Reservation
-          </button>
-          <button
-            onClick={() => handleRemove(item._id)}
+            onClick={() => 
+              handleRemove(item._id, {
+                date: dayjs(item.date).format("YYYY-MM-DD"),
+                startTime: item.time,
+                endTime: calculateEndTime(item.time, item.duration),
+                therapistId: item.therapist?._id,
+              })
+            }
             className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 active:scale-95"
           >
             Remove Reservation
@@ -106,6 +164,13 @@ export default function ReservationList() {
   )
 }
 
+const calculateEndTime = (startTime: string, duration: number): string => {
+  const [hours, minutes] = startTime.split(":").map(Number);
+  const endTime = new Date();
+  endTime.setHours(hours + Math.floor(duration));
+  endTime.setMinutes(minutes + (duration % 1) * 60);
+  return endTime.toTimeString().slice(0, 5); // Format as HH:mm
+};
 
 // 'use client'
 // import { useSession } from 'next-auth/react'

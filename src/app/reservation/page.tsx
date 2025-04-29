@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { MassageItem, TherapistItem, UserItem } from "../../../interface";
 import getMassageShops from "@/libs/getMassageShops";
 import getVerifiedTherapists from "@/libs/getVerifiedTherapist";
+import getAvailableTherapists from "@/libs/getAvailableTherapists";
 import {
   DatePicker,
   TimePicker,
@@ -18,12 +19,17 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import addReservation from "@/libs/addReservation";
 import updateReservation from "@/libs/updateReservation";
+import addUnavailableTimeSlot from "@/libs/addUnavailableTimeSlot";
+import deleteUnavailableTimeSlot from "@/libs/deleteUnavailableTimeSlot";
 import getMe from "@/libs/getMe";
 import weekday from "dayjs/plugin/weekday";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import "dayjs/locale/en";
+import CustomTimePicker from "@/components/CustomTimePicker";
 dayjs.extend(weekday);
 dayjs.extend(localizedFormat);
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 export default function Reservation() {
   const router = useRouter();
@@ -55,21 +61,48 @@ export default function Reservation() {
   }, []);
 
   const [Therapists, setTherapists] = useState<TherapistItem[]>([]);
+
   useEffect(() => {
     const fetchTherapists = async () => {
-      var data = await getVerifiedTherapists();
-      setTherapists(data.therapists);
+      if (!bookDate || !massageShop || !time || !session?.accessToken) {
+        console.log("Missing required parameters");
+        return; // Ensure all required parameters and token are available
+      }
+
+      const day = dayjs(bookDate).format("dddd"); // Get the day of the week (e.g., "Monday")
+      const date = bookDate.format("YYYY-MM-DD"); // Format date as YYYY-MM-DD
+      const startTime = time; // Start time
+      const endTime = dayjs(time, "HH:mm").add(duration, "hour").format("HH:mm"); // Calculate end time
+
+      console.log("bookDate", bookDate.format("YYYY-MM-DD"));
+      console.log("date", date);
+      console.log("day", day);
+      try {
+        const data = await getAvailableTherapists(
+          date,
+          day,
+          startTime,
+          endTime,
+          massageShop
+        );
+        console.log("Fetched therapists data:", data);
+        setTherapists(data.data);
+        console.log("Updated Therapists state:", data.data);
+      } catch (error) {
+        console.error("Error fetching therapists:", error);
+      }
     };
+
     fetchTherapists();
-  }, []);
+  }, [bookDate, massageShop, time, duration]);
 
   // Filter therapists based on the selected massage shop
-  const filteredTherapists = allTherapists.filter(
-    (therapist) => 
-      therapist.workingInfo.some(
-        (working) => working.massageShopID === massageShop
-      )
-  );
+  // const filteredTherapists = allTherapists.filter(
+  //   (therapist) => 
+  //     therapist.workingInfo.some(
+  //       (working) => working.massageShopID === massageShop
+  //     )
+  // );
 
   // Handle reservation form submission
   const handleReservation = async () => {
@@ -78,26 +111,42 @@ export default function Reservation() {
       router.push("/api/auth/signin");
       return;
     }
-
-    console.log("user reservation token: ", session?.accessToken); //debug user token
-
+  
+    console.log("User reservation token: ", session?.accessToken);
+  
     if (!massageShop) {
       alert("Please select a massage shop.");
       return;
     }
-
+  
     if (!bookDate || !dayjs(bookDate).isValid()) {
       alert("Please select a valid date.");
       return;
     }
-
-    const date = bookDate.toISOString();
-    console.log("Date to be sent:", date);
-
-    console.log(session.user.id);
-
+  
+    const date = dayjs(bookDate).format("YYYY-MM-DD");
+    const startTime = time;
+    const endTime = dayjs(time, "HH:mm").add(duration, "hour").format("HH:mm");
+    const day = dayjs(bookDate).format("dddd");
+  
+    let unavailableTimeSlotAdded = false;
+  
     try {
-      await addReservation(
+      // Add unavailable time slot
+      const unavailableTimeSlotResponse = await addUnavailableTimeSlot(
+        date,
+        day,
+        startTime,
+        endTime,
+        therapist,
+        session.accessToken
+      );
+      console.log("Response from addUnavailableTimeSlot:", unavailableTimeSlotResponse);
+  
+      unavailableTimeSlotAdded = true; // Mark as added
+  
+      // Add reservation
+      const reservationResponse = await addReservation(
         date,
         time,
         duration,
@@ -106,10 +155,30 @@ export default function Reservation() {
         massageProgram,
         session.accessToken
       );
+      console.log("Response from addReservation:", reservationResponse);
+  
       alert("Reservation successful!");
       router.push("/");
     } catch (error) {
       console.error("Reservation failed:", error);
+  
+      // Rollback if unavailable time slot was added
+      if (unavailableTimeSlotAdded) {
+        try {
+          console.log("Rolling back unavailable time slot...");
+          await deleteUnavailableTimeSlot(
+            therapist,
+            session.accessToken,
+            date,
+            startTime,
+            endTime
+          );
+          console.log("Rollback successful: Unavailable time slot removed.");
+        } catch (rollbackError) {
+          console.error("Rollback failed:", rollbackError);
+        }
+      }
+  
       alert("Reservation failed. Please try again.");
     }
   };
@@ -152,15 +221,19 @@ export default function Reservation() {
               <option value="" disabled hidden>
                 Select therapist
               </option>
-              {Therapists.map((th) => (
-                <option key={th._id} value={th._id}>
-                  {th.user.name}
-                </option>
-                //{/* ไม่ต้องแก้นะ */}
-                //{/* ไม่ต้องแก้นะ */}
-                //{/* ไม่ต้องแก้นะ */}
-                //{/* ไม่ต้องแก้นะ */}
-              ))}
+              {!massageShop ? (
+                <option disabled>Please select a massage shop</option>
+              ) : !bookDate ? (
+                <option disabled>Please select date</option>
+              ) : Therapists && Therapists.length > 0 ? (
+                Therapists.map((th) => (
+                  <option key={th._id} value={th._id}>
+                    {th.user.name}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No therapists available</option>
+              )}
             </select>
           </div>
         </div>

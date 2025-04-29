@@ -18,6 +18,7 @@ export default async function getReservation(
   const json = await res.json();
   // backend returns { data: { _id, date, time, duration, massageShop, massageProgram, therapist } }
   const reservation = json.data;
+  console.log("readableDate", dayjs(reservation.date).format("YYYY-MM-DD"));
   return {
     reservation,
     formattedDate: dayjs(reservation.date),

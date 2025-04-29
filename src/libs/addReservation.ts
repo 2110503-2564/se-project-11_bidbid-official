@@ -36,7 +36,7 @@ export default async function addReservation(
       }),
     }
   );
-  console.log(response.status);
+  console.log(response);
   if (!response.ok) {
     console.log(response.status);
     throw new Error("Cannot add Reservation");
